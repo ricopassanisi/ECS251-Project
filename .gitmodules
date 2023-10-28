@@ -1,0 +1,3 @@
+[submodule "riscv-console"]
+	path = riscv-console
+	url = https://github.com/UCDClassNitta/riscv-console.git
