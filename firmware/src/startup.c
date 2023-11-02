@@ -46,6 +46,8 @@ __attribute__((always_inline)) inline void csr_write_mip(uint32_t val) {
 #define MTIMECMP_LOW    (*((volatile uint32_t *)0x40000010))
 #define MTIMECMP_HIGH   (*((volatile uint32_t *)0x40000014))
 #define CONTROLLER      (*((volatile uint32_t *)0x40000018))
+#define INTERRUPT_ENABLE (*((volatile uint32_t *)0x40000000))
+#define INTERRUPT_PENDING (*((volatile uint32_t *)0x40000004))
 
 void init(void){
     uint8_t *Source = _erodata;
@@ -63,6 +65,9 @@ void init(void){
 
     csr_write_mie(0x88F);       // Enable all interrupt soruces
     csr_enable_interrupts();    // Global interrupt enable
+
+   
+
     MTIMECMP_LOW = 1;
     MTIMECMP_HIGH = 0;
 }
@@ -79,9 +84,10 @@ void c_interrupt_handler(uint32_t cause){
     global++;
     controller_status = CONTROLLER;
     uint32_t mip = csr_read_mip();
-    if((!mip) & 0x4) { //Cmd interrupt?
+    if((INTERRUPT_PENDING) & 0x4) { //Cmd interrupt?
         cmd_interrupt++;
-        csr_write_mip(0x3F);
+        //csr_write_mip(0x3F);
+        INTERRUPT_PENDING = INTERRUPT_PENDING | 0x4;
     }
 }
 
