@@ -12,6 +12,8 @@ volatile uint32_t *MEDIUM_PALETTE = (volatile uint32_t *)(0x500F2000);
 volatile uint32_t *MEDIUM_CONTROL = (volatile uint32_t *)(0x500F5F00);
 volatile uint32_t *MODE_REGISTER = (volatile uint32_t *)(0x500F6780);
 
+uint32_t GetTicks(void);
+uint32_t GetController(void);
 
 int main() {
     int a = 4;
@@ -45,8 +47,10 @@ int main() {
     *MODE_REGISTER = 1;
 
     while (1) {
-        int c = a + b + global;
+        //int c = a + b + global;
+        global = GetTicks();
         if(global != last_global){
+            controller_status = GetController();
             if(controller_status){
                 VIDEO_MEMORY[x_pos] = ' ';
                 if(controller_status & 0x1){
@@ -75,11 +79,11 @@ int main() {
             last_global = global;
         }
         countdown--;
-        if(!countdown){
+        /*if(!countdown){
             global++;
-            controller_status = (*((volatile uint32_t *)0x40000018));
+            controller_status = GetController();
             countdown = 100000;
-        }
+        }*/
     }
     return 0;
 }
