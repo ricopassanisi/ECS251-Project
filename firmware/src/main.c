@@ -4,6 +4,7 @@
 
 volatile int global = 42;
 volatile uint32_t controller_status = 0;
+volatile uint32_t *MEDIUM_PALETTE = (volatile uint32_t *)(0x500F2000);
 volatile uint32_t cmd_interrupt = 0;
 volatile char *VIDEO_MEMORY = (volatile char *)(0x50000000 + 0xF4800);
 volatile uint32_t *CartridgeStatus = (volatile uint32_t *)(0x4000001C);

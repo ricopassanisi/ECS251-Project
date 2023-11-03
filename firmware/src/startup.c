@@ -75,6 +75,7 @@ void init(void){
 extern volatile int global;
 extern volatile uint32_t controller_status;
 extern volatile uint32_t cmd_interrupt;
+extern volatile uint32_t *MEDIUM_PALETTE;
 
 void c_interrupt_handler(uint32_t cause){
     uint64_t NewCompare = (((uint64_t)MTIMECMP_HIGH)<<32) | MTIMECMP_LOW;
@@ -88,6 +89,11 @@ void c_interrupt_handler(uint32_t cause){
         INTERRUPT_PENDING = INTERRUPT_PENDING | 0x4;
     } else if((INTERRUPT_PENDING) & 0x2) { //Video interrupt?
         //Anything to do here?
+        if(global % 10) {
+            MEDIUM_PALETTE[1] = 0xFFFF0000;
+        } else {
+            MEDIUM_PALETTE[1] = 0xFFFF06B5;
+        }
         INTERRUPT_PENDING = INTERRUPT_PENDING | 0x2;
     }
 }
