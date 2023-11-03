@@ -9,6 +9,8 @@ volatile uint32_t *MEDIUM_PALETTE = (volatile uint32_t *)(0x500F2000);
 volatile uint32_t *MEDIUM_CONTROL = (volatile uint32_t *)(0x500F5F00);
 volatile uint32_t *MODE_REGISTER = (volatile uint32_t *)(0x500F6780);
 
+volatile uint8_t *MEDIUM_DATA_1 = (volatile uint8_t *)(0x500D0400);
+
 uint32_t MediumControl(uint8_t palette, int16_t x, int16_t y, uint8_t z, uint8_t index);
 
 int main() {
@@ -36,10 +38,14 @@ int main() {
     for(int y = 0; y < 32; y++){
         for(int x = 0; x < 32; x++){
             MEDIUM_DATA[y*32+x] = 1;
+            MEDIUM_DATA_1[y*32+x] = 2;
         }
     }
+
     MEDIUM_PALETTE[1] = 0xFFFF0000; // A R G B
+    MEDIUM_PALETTE[2] = 0X0000F94A;
     MEDIUM_CONTROL[0] = MediumControl(0, 0, 0, 0, 0);
+    MEDIUM_CONTROL[1] = MediumControl(0, 50, 50, 1, 1);
     *MODE_REGISTER = 1;
 
     while (1) {
