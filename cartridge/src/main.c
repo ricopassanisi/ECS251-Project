@@ -28,7 +28,9 @@ int main() {
         }
     }
     MEDIUM_PALETTE[1] = 0xFFFF06B5; // A R G B
+    MEDIUM_PALETTE[3] = 0xFFFF0000;
     MEDIUM_CONTROL[0] = MediumControl(0, 0, 0, 0, 0);
+    MEDIUM_CONTROL[1] = MediumControl(0,50,50,1,0); //pallete, x, y, z, index
     *MODE_REGISTER = 1;
 
     while (1) {
