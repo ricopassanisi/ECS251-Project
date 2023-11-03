@@ -62,7 +62,7 @@ void init(void){
     while(Base < End){
         *Base++ = 0;
     }
-
+    INTERRUPT_ENABLE = INTERRUPT_ENABLE | 0xFFF;
     csr_write_mie(0x88F);       // Enable all interrupt soruces
     csr_enable_interrupts();    // Global interrupt enable
 
@@ -83,11 +83,12 @@ void c_interrupt_handler(uint32_t cause){
     MTIMECMP_LOW = NewCompare;
     global++;
     controller_status = CONTROLLER;
-    uint32_t mip = csr_read_mip();
     if((INTERRUPT_PENDING) & 0x4) { //Cmd interrupt?
         cmd_interrupt++;
-        //csr_write_mip(0x3F);
         INTERRUPT_PENDING = INTERRUPT_PENDING | 0x4;
+    } else if((INTERRUPT_PENDING) & 0x2) { //Video interrupt?
+        //Anything to do here?
+        INTERRUPT_PENDING = INTERRUPT_PENDING | 0x2;
     }
 }
 

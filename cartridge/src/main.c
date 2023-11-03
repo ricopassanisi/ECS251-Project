@@ -12,13 +12,14 @@ volatile uint32_t *MEDIUM_PALETTE = (volatile uint32_t *)(0x500F2000);
 volatile uint32_t *MEDIUM_CONTROL = (volatile uint32_t *)(0x500F5F00);
 volatile uint32_t *MODE_REGISTER = (volatile uint32_t *)(0x500F6780);
 
+//Syscall setup
 uint32_t GetTicks(void);
 uint32_t GetController(void);
 uint32_t GetCmd(void);
 
 int main() {
     int last_global = 42;
-    int x_pos = 12;
+    int x_pos = 0;
     uint32_t lastCmd = 0;
     // Fill out sprite data
     for(int y = 0; y < 32; y++){
@@ -26,7 +27,7 @@ int main() {
             MEDIUM_DATA[y*32+x] = 1;
         }
     }
-    MEDIUM_PALETTE[1] = 0xFFFF0000; // A R G B
+    MEDIUM_PALETTE[1] = 0xFFFF06B5; // A R G B
     MEDIUM_CONTROL[0] = MediumControl(0, 0, 0, 0, 0);
     *MODE_REGISTER = 1;
 
@@ -63,7 +64,7 @@ int main() {
             }
             if(cmd != lastCmd) { //reset position if cmd pressed
                 lastCmd = cmd;
-                x_pos = 12;
+                x_pos = 0;
                 VIDEO_MEMORY[x_pos] = 'X';
                 MEDIUM_CONTROL[0] = MediumControl(0, (x_pos & 0x3F)<<3, (x_pos>>6)<<3, 0, 0);
             }
