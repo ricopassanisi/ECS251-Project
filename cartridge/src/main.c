@@ -36,10 +36,18 @@ int main() {
         }
     }
 
+    for(int y = 0; y < 32; ++y) {
+        for(int x = 31; x >= y; --x) {
+            MEDIUM_DATA[(1024*2)+(y*32+x)] = 3;
+        }
+    }
+
     MEDIUM_PALETTE[1] = 0xFFFF06B5; // A R G B
     MEDIUM_PALETTE[2] = 0xFF00FF00; //Green
+    MEDIUM_PALETTE[3] = 0xFF0000FF; //Blue
     MEDIUM_CONTROL[0] = MediumControl(0, 0, 0, 0, 0);
     MEDIUM_CONTROL[1] = MediumControl(0,50,50,1,1); //pallete, x, y, z, index
+    MEDIUM_CONTROL[2] = MediumControl(0,100,100,1,2);
     *MODE_REGISTER = 1;
 
     while (1) {
