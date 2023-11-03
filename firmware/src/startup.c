@@ -88,11 +88,8 @@ void c_interrupt_handler(uint32_t cause){
         cmd_interrupt++;
         INTERRUPT_PENDING = INTERRUPT_PENDING | 0x4;
     } else if((INTERRUPT_PENDING) & 0x2) { //Video interrupt?
-        //Anything to do here?
-        if(global % 10) {
-            MEDIUM_PALETTE[1] = 0xFFFF0000;
-        } else {
-            MEDIUM_PALETTE[1] = 0xFFFF06B5;
+        if(global % 60 == 0) { //swap colors every 60 frames
+            MEDIUM_PALETTE[1] = MEDIUM_PALETTE[1] ^ 0x06B5;
         }
         INTERRUPT_PENDING = INTERRUPT_PENDING | 0x2;
     }
