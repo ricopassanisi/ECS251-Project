@@ -4,10 +4,12 @@
 
 volatile int global = 42;
 volatile uint32_t controller_status = 0;
-
+volatile uint32_t *MEDIUM_PALETTE = (volatile uint32_t *)(0x500F2000);
+volatile uint32_t cmd_interrupt = 0;
 volatile char *VIDEO_MEMORY = (volatile char *)(0x50000000 + 0xF4800);
 volatile uint32_t *CartridgeStatus = (volatile uint32_t *)(0x4000001C);
 typedef void (*FunctionPtr)(void);
+
 
 int main() {
     int a = 4;
@@ -17,21 +19,8 @@ int main() {
     char *Buffer = malloc(32);
     strcpy(Buffer,"OS STARTED");
     strcpy((char *)VIDEO_MEMORY,Buffer);
-    /*VIDEO_MEMORY[0] = 'H';
-    VIDEO_MEMORY[1] = 'e';
-    VIDEO_MEMORY[2] = 'l';
-    VIDEO_MEMORY[3] = 'l';
-    VIDEO_MEMORY[4] = 'o';
-    VIDEO_MEMORY[5] = ' ';
-    VIDEO_MEMORY[6] = 'W';
-    VIDEO_MEMORY[7] = 'o';
-    VIDEO_MEMORY[8] = 'r';
-    VIDEO_MEMORY[9] = 'l';
-    VIDEO_MEMORY[10] = 'd';
-    VIDEO_MEMORY[11] = '!';
-    VIDEO_MEMORY[12] = 'X';*/
-
-
+    
+    //Wait for cartridge 
     while (1){
         if(*CartridgeStatus & 0x1){
             FunctionPtr Fun = (FunctionPtr)((*CartridgeStatus) & 0xFFFFFFFC);
