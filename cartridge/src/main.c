@@ -43,7 +43,7 @@ int main() {
     }
 
     MEDIUM_PALETTE[1] = 0xFFFF0000; // A R G B
-    MEDIUM_PALETTE[2] = 0X0000F94A;
+    MEDIUM_PALETTE[2] = 0X0000F94A; // Green
     MEDIUM_CONTROL[0] = MediumControl(0, 0, 0, 0, 0);
     MEDIUM_CONTROL[1] = MediumControl(0, 50, 50, 1, 1);
     *MODE_REGISTER = 1;
