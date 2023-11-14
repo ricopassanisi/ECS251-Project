@@ -29,13 +29,13 @@ int main() {
            // MEDIUM_DATA[(1024)+(y*32+x)] = 2;
         }
     }
-
+    // Create green triangle
     for(int y = 0; y < 32; ++y) {
         for(int x = 0; x < y+1; ++x) {
             MEDIUM_DATA[(1024)+(y*32+x)] = 2;
         }
     }
-
+    // Create blue triangle
     for(int y = 0; y < 32; ++y) {
         for(int x = 31; x >= y; --x) {
             MEDIUM_DATA[(1024*2)+(y*32+x)] = 3;
@@ -80,10 +80,11 @@ int main() {
                 }
                 VIDEO_MEMORY[x_pos] = 'X';
                 MEDIUM_CONTROL[0] = MediumControl(0, (x_pos & 0x3F)<<3, (x_pos>>6)<<3, 0, 0);
+                //MEDIUM_CONTROL[2] = MediumControl(0,((x_pos + 100)& 0x3F)<<3,((x_pos+100)>>6)<<3,1,2); //for moving blue triangle
             }
             if(cmd != lastCmd) { //reset position if cmd pressed
                 lastCmd = cmd;
-                x_pos = 0;
+                x_pos = 40;
                 VIDEO_MEMORY[x_pos] = 'X';
                 MEDIUM_CONTROL[0] = MediumControl(0, (x_pos & 0x3F)<<3, (x_pos>>6)<<3, 0, 0);
             }
