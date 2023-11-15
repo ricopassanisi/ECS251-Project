@@ -3,6 +3,7 @@
 */
 #include <stdint.h>
 
+
 volatile uint8_t *SMALL_DATA = (volatile uint8_t *)(0x500E0000);
 volatile uint32_t *SMALL_PALETTE = (volatile uint32_t *)(0x500F3000);
 volatile uint32_t *SMALL_CONTROL = (volatile uint32_t *)(0x500F6300);

@@ -18,7 +18,7 @@ uint32_t GetCmd(void);
 int main() {
     int last_global = 42;
     int x_pos = 0;
-    uint32_t lastCmd = 0;
+    uint32_t lastCmd = GetCmd();
     // Fill out sprite data
     
 
@@ -45,9 +45,11 @@ int main() {
         }
     }
 
-    MEDIUM_PALETTE[1] = 0xFFFF06B5; // A R G B
-    MEDIUM_PALETTE[2] = 0xFF00FF00; //Green
-    MEDIUM_PALETTE[3] = 0xFF0000FF; //Blue
+    uint32_t sprite_palette[256];
+    sprite_palette[1] = 0xFFFF06B5; // A R G B
+    sprite_palette[2] = 0xFF00FF00; //Green
+    sprite_palette[3] = 0xFF0000FF; //Blue
+    load_palette(MEDIUM, sprite_palette, 0);
     sprite_t square;
     square.type = MEDIUM;
     square.data_index = 0;
