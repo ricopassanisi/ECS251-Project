@@ -95,55 +95,26 @@ void c_interrupt_handler(uint32_t cause){
 }
 
 uint32_t c_system_call(uint32_t arg0, uint32_t arg1, uint32_t arg2, uint32_t arg3, uint32_t arg4, uint32_t call){
-    if(1 == call){
-        return global;
+    switch(call) {
+        case 1:
+            return global;
+        case 2:
+            return controller_status;
+        case 3:
+            return cmd_interrupt;
+        case 4:
+            return load_sprite(*((sprite_t*)arg0));
+        case 5:
+            return load_sprite_data((SPRITE_TYPE)arg0, (uint8_t*)arg1, (uint8_t)arg2);
+        case 6:
+            return load_palette((SPRITE_TYPE) arg0, (uint32_t*) arg1, (uint8_t) arg2);
+        case 7:
+            return display_sprite((uint16_t) arg0, (uint16_t) arg1, (uint16_t) arg2, (uint8_t) arg3);
+        case 8:
+            return delete_sprite((uint16_t) arg0);
+        case 9:
+            return change_sprite_palette((uint16_t) arg0, (uint8_t) arg1);
+        default:
+            return -1;
     }
-    else if(2 == call){
-        return controller_status;
-    }
-    else if(3 == call) {
-        return cmd_interrupt;
-    }
-    else if(4 == call) {
-        //load_sprite_sys
-        sprite_t *sprite = (sprite_t*) arg0;
-        int16_t retVal = load_sprite(*sprite);
-        return retVal;
-    }
-    else if(5 == call) {
-        //load_sprite_data_sys
-        SPRITE_TYPE type = (SPRITE_TYPE) arg0;
-        uint8_t * data = (uint8_t*) arg1;
-        uint8_t index = (uint8_t) arg2;
-        return load_sprite_data(type, data, index);
-    }
-    else if(6 == call) {
-        //load_sprite_palette_sys
-        SPRITE_TYPE type = (SPRITE_TYPE) arg0;
-        uint32_t * palette = (uint32_t*) arg1;
-        uint8_t index = (uint8_t) arg2;
-        return load_palette(type, palette, index);
-    }
-    else if(7 == call) {
-        //display_sprite_sys
-        //display_sprite(uint16_t sprite_id, uint16_t x_off, uint16_t y_off, uint8_t z_off)
-        uint16_t sprite_id = (uint16_t) arg0;
-        uint16_t x_off = (uint16_t) arg1;
-        uint16_t y_off = (uint16_t) arg2;
-        uint8_t z_off = (uint8_t) arg3;
-        return display_sprite(sprite_id, x_off, y_off, z_off);
-    }
-    else if(8 == call) {
-        //delete_sprite_sys
-        uint16_t sprite_id = (uint16_t) arg0;
-        return delete_sprite(sprite_id);
-    }
-    else if(9 == call) {
-        //change_sprite_palette
-        uint16_t sprite_id = (uint16_t) arg0;
-        uint8_t palette_index = (uint8_t) arg1;
-        return change_sprite_palette(sprite_id, palette_index);
-    }
-    return -1;
-
 }
