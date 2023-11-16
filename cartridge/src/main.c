@@ -1,6 +1,6 @@
 #include <stdint.h>
 #include <stdlib.h>
-#include <sprite.c>
+#include <sprite.h>
 
 volatile int global = 42;
 volatile uint32_t controller_status = 0;
@@ -35,13 +35,13 @@ int main() {
     // Create green triangle
     for(int y = 0; y < 32; ++y) {
         for(int x = 0; x < y+1; ++x) {
-            MEDIUM_DATA[(1024)+(y*32+x)] = 2;
+           // MEDIUM_DATA[(1024)+(y*32+x)] = 2;
         }
     }
     // Create blue triangle
     for(int y = 0; y < 32; ++y) {
         for(int x = 31; x >= y; --x) {
-            MEDIUM_DATA[(1024*2)+(y*32+x)] = 3;
+            //MEDIUM_DATA[(1024*2)+(y*32+x)] = 3;
         }
     }
 
@@ -49,6 +49,7 @@ int main() {
     sprite_palette[1] = 0xFFFF06B5; // A R G B
     sprite_palette[2] = 0xFF00FF00; //Green
     sprite_palette[3] = 0xFF0000FF; //Blue
+
     load_palette(MEDIUM, sprite_palette, 0);
     sprite_t square;
     square.type = MEDIUM;

@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <sprite.c>
 
 extern uint8_t _erodata[];
 extern uint8_t _data[];
@@ -102,6 +103,46 @@ uint32_t c_system_call(uint32_t arg0, uint32_t arg1, uint32_t arg2, uint32_t arg
     }
     else if(3 == call) {
         return cmd_interrupt;
+    }
+    else if(4 == call) {
+        //load_sprite_sys
+        sprite_t *sprite = (sprite_t*) arg0;
+        int16_t retVal = load_sprite(*sprite);
+        return retVal;
+    }
+    else if(5 == call) {
+        //load_sprite_data_sys
+        SPRITE_TYPE type = (SPRITE_TYPE) arg0;
+        uint8_t * data = (uint8_t*) arg1;
+        uint8_t index = (uint8_t) arg2;
+        return load_sprite_data(type, data, index);
+    }
+    else if(6 == call) {
+        //load_sprite_palette_sys
+        SPRITE_TYPE type = (SPRITE_TYPE) arg0;
+        uint32_t * palette = (uint32_t*) arg1;
+        uint8_t index = (uint8_t) arg2;
+        return load_palette(type, palette, index);
+    }
+    else if(7 == call) {
+        //display_sprite_sys
+        //display_sprite(uint16_t sprite_id, uint16_t x_off, uint16_t y_off, uint8_t z_off)
+        uint16_t sprite_id = (uint16_t) arg0;
+        uint16_t x_off = (uint16_t) arg1;
+        uint16_t y_off = (uint16_t) arg2;
+        uint8_t z_off = (uint8_t) arg3;
+        return display_sprite(sprite_id, x_off, y_off, z_off);
+    }
+    else if(8 == call) {
+        //delete_sprite_sys
+        uint16_t sprite_id = (uint16_t) arg0;
+        return delete_sprite(sprite_id);
+    }
+    else if(9 == call) {
+        //change_sprite_palette
+        uint16_t sprite_id = (uint16_t) arg0;
+        uint8_t palette_index = (uint8_t) arg1;
+        return change_sprite_palette(sprite_id, palette_index);
     }
     return -1;
 
