@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <core/scheduler.h>
 
 volatile int global = 42;
 volatile uint32_t controller_status = 0;
@@ -10,14 +11,30 @@ volatile char *VIDEO_MEMORY = (volatile char *)(0x50000000 + 0xF4800);
 volatile uint32_t *CartridgeStatus = (volatile uint32_t *)(0x4000001C);
 typedef void (*FunctionPtr)(void);
 
+void func1(void*);
+void func2(void*);
+
+int max_counter = 1000;
+
+TThreadContext MainThread;
+TCB* threadOne;
+TCB* threadTwo;
+
+void printNum(char*);
 
 int main() {
     int a = 4;
     int b = 12;
     int last_global = 42;
+
+    threadOne = threadCreate(func1, NULL);
+    threadTwo = threadCreate(func2, NULL);
+
+    int counter = 0;
+
     int x_pos = 12;
     char *Buffer = malloc(32);
-    strcpy(Buffer,"OS STARTED");
+    itoa(counter, Buffer, 10);
     strcpy((char *)VIDEO_MEMORY,Buffer);
     
     //Wait for cartridge 
@@ -26,6 +43,12 @@ int main() {
             FunctionPtr Fun = (FunctionPtr)((*CartridgeStatus) & 0xFFFFFFFC);
             Fun();
         }
+
+        itoa(counter, Buffer, 10);
+        strcpy((char *)VIDEO_MEMORY,Buffer);
+        counter = (counter + 1) % max_counter;
+
+        SwitchThread(&MainThread, threadOne -> stacktop);
     }
 
     return 0;
@@ -52,4 +75,30 @@ char *_sbrk(int numbytes){
     return NULL;
   }
 
+}
+
+
+void func1(void* num) {
+
+  while(1) {
+    int num = (int)num;
+    num++;
+    num++;
+
+    SwitchThread(&(threadOne -> stacktop), threadTwo -> stacktop);
+  }
+
+  return;
+}
+
+void func2(void* num) {
+  while(1) {
+    int num = (int)num;
+    num++;
+    num++;
+
+    SwitchThread(&(threadTwo -> stacktop), MainThread);
+  }
+  
+  return;
 }

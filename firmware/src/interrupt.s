@@ -1,5 +1,5 @@
 .section .text, "ax"
-.global _interrupt_handler
+.global _interrupt_handler, _system_call
 _interrupt_handler:
     csrw    mscratch,ra
     csrr    ra,mcause
@@ -51,3 +51,4 @@ _system_call:
     call    c_system_call
     csrr    gp,mscratch
     mret
+
