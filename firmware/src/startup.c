@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <sprite.c>
+#include <background.c>
 
 extern uint8_t _erodata[];
 extern uint8_t _data[];
@@ -114,6 +115,15 @@ uint32_t c_system_call(uint32_t arg0, uint32_t arg1, uint32_t arg2, uint32_t arg
             return delete_sprite((uint16_t) arg0);
         case 9:
             return change_sprite_palette((uint16_t) arg0, (uint8_t) arg1);
+        case 10: //load background palette
+            return load_background_palette((uint32_t*)arg0, (uint8_t) arg1);
+        case 11: //load background data pixel mode
+            return load_background_data_pixel((uint8_t*)arg0, (uint8_t) arg1);
+        case 12: //uint32_t load_background_sys(uint32_t background_ptr);
+//uint32_t delete_background_sys(uint32_t background_id);
+            return load_background(*((background_t*)arg0));
+        case 13:
+            return delete_background((uint8_t)arg0);
         default:
             return -1;
     }

@@ -41,7 +41,7 @@ int16_t display_sprite(uint16_t sprite_id, uint16_t x_off, uint16_t y_off, uint8
             break;
         case 0b10: //large
             if(!LARGE_CONTROL[(sprite_id >> 2)]) return -1; //Sprite id does not exist
-            LARGE_CONTROL[(sprite_id >> 2)] = ((uint32_t)(LARGE_CONTROL[(sprite_id >> 2)] & 0xFF000003)) | (((uint32_t)z_off)<<21) | (((uint32_t)y_off+32)<<12) | (((uint32_t)x_off+32)<<2);
+            LARGE_CONTROL[(sprite_id >> 2)] = ((uint32_t)(LARGE_CONTROL[(sprite_id >> 2)] & 0xFF000003)) | (((uint32_t)z_off)<<21) | (((uint32_t)y_off+64)<<12) | (((uint32_t)x_off+64)<<2);
             break;
         default:
             return -1; //something went very wrong
