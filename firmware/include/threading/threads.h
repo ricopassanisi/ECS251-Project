@@ -9,6 +9,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <utils/myqueue.h>
 
 typedef void (*TThreadEntry)(void *);
 typedef uint32_t *TThreadContext;
@@ -21,9 +22,22 @@ void SwitchThread(TThreadContext* oldStacktop, TThreadContext newStacktop);
 
 // const int STACK_SIZE = 128;
 
+enum WaitingFor {
+    LOCK = 1,
+    THREAD,
+    NONE
+};
+
+/**
+ * Thread Control Block
+*/
 typedef struct TCB{
     int threadID;
     int priority;
+
+    int waitingFor;
+    int waitingItemID;
+
     uint32_t* stacktop;
     uint32_t stack[128];
 }TCB;
@@ -36,16 +50,18 @@ TCB* threadCreate(TThreadEntry entry, void* param);
 /**
  * Moves thread to waiting list to wait for some event to happen
 */
-int threadWait(TCB* thread, int eventID);
+// int threadWait(TCB* thread, int eventID);
 
 /**
  * Thread yields CPU and moves to ready list
 */
-int threadYield(TCB* thread);
-/**
- * Destroys thread and frees memory
-*/
-int threadDestroy(TCB* thread);
+// int threadYield(TCB* thread);
+// /**
+//  * Destroys thread and frees memory
+// */
+// int threadDestroy(TCB* thread);
+
+int threadYieldCall(void);
 
 
 #endif

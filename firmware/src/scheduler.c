@@ -5,27 +5,27 @@
 */
 #include <threading/threads.h>
 #include <core/scheduler.h>
+#include <stdbool.h>
 
-TCB* ready[3];
 
-// int initScheduler() {
+Scheduler scheduler;
+int MAX_THREADS = 32;
+int THREAD_STACK_SIZE = 128;
+int threadCounter = 0;
 
-//     // Add kernel thread to running list
-//     TCB* kernel = malloc(sizeof(TThreadContext));
-//     kernel -> threadID = 0;
-//     kernel -> thread = malloc(sizeof(TThreadContext));
+// Queue sizes
+int readySize = 0;
+int waitingSize = 0;
+int finishedSize = 0;
 
-//     ready[0] = kernel;
+int initScheduler() {
+    scheduler.ready = queueInit(MAX_THREADS);
+    scheduler.waiting = queueInit(MAX_THREADS - 1);
+    scheduler.finished = calloc(sizeof(uint32_t), 128);
 
-//     return 0;
-    
-// }
+    TCB* mainThread = threadCreate(NULL, NULL);
 
-// int threadNum = 0;
-// int switchThreads() {
-//     int temp = threadNum;
-//     threadNum = (threadNum + 1) % 2;
-//     SwitchThread(&(ready[temp] -> thread), ready[threadNum] -> thread);
+    scheduler.running = mainThread;
 
-//     return 0;
-// }
+    return 0;
+}

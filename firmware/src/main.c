@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <core/scheduler.h>
+#include <threading/threads.h>
 
 volatile int global = 42;
 volatile uint32_t controller_status = 0;
@@ -27,8 +28,13 @@ int main() {
     int b = 12;
     int last_global = 42;
 
+    initScheduler();
+
     threadOne = threadCreate(func1, NULL);
     threadTwo = threadCreate(func2, NULL);
+
+    queueEnqueue(scheduler.ready, (void*)threadOne);
+    queueEnqueue(scheduler.ready, (void*)threadTwo);
 
     int counter = 0;
 
@@ -48,7 +54,7 @@ int main() {
         strcpy((char *)VIDEO_MEMORY,Buffer);
         counter = (counter + 1) % max_counter;
 
-        SwitchThread(&MainThread, threadOne -> stacktop);
+        threadYieldCall();
     }
 
     return 0;
@@ -85,19 +91,21 @@ void func1(void* num) {
     num++;
     num++;
 
-    SwitchThread(&(threadOne -> stacktop), threadTwo -> stacktop);
+    threadYieldCall();
   }
 
   return;
 }
 
 void func2(void* num) {
+
+  int i = 12;
   while(1) {
     int num = (int)num;
     num++;
     num++;
 
-    SwitchThread(&(threadTwo -> stacktop), MainThread);
+    threadYieldCall();
   }
   
   return;

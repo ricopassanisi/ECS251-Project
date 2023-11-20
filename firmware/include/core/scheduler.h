@@ -1,42 +1,31 @@
-#include <stddef.h>
-#include <stdint.h>
 #include <threading/threads.h>
 #include <stdlib.h>
+#include <utils/myqueue.h>
 
-
-
-
-// typedef struct TCB {
-//     int threadID;
-//     int priority;
-//     void* param;
-//     TThreadContext thread;
-// }TCB;
-
-
-extern TCB* ready[];
-extern TCB* waiting[];
-extern int finished[];
-extern TCB* running;
+#ifndef SCHEDULER_H
+#define SCHEDULER_H
 
 typedef struct Scheduler {
-    TCB* ready;
-    TCB* waiting;
+    Queue* ready;
+    Queue* waiting;
     TCB* running;
     
     int* finished;
     
 }Scheduler;
 
+extern Scheduler scheduler;
+extern int MAX_THREADS;
+extern int THREAD_STACK_SIZE;
+extern int threadCounter;
+
+// Queue Sizes
+// Need to be outside of struct because Q -> size returns memory address of struct for some reason
+extern int readySize;
+extern int waitingSize;
+extern int finishedSize;
+
 /* Init Scheduler  with main */
 int initScheduler();
 
-/* Moves next thread ready to running & running thread to ready list */
-int switchThreads();
-
-/**
- * Wakes thread from waiting list and adds it to ready list
-*/
-int wakeThread(int threadID);
-
-int threadDone(int threadID);
+#endif
