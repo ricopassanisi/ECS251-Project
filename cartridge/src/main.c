@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stdlib.h>
 
 volatile int global = 42;
 volatile uint32_t controller_status = 0;
@@ -54,6 +55,7 @@ int main() {
         //int c = a + b + global;
         global = GetTicks();
         uint32_t cmd = GetCmd();
+
         if(global != last_global){
             controller_status = GetController();
             if(controller_status){

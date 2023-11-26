@@ -1,4 +1,6 @@
 #include <stdint.h>
+#include <utils/utils.h>
+#include <threading/threads.h>
 
 extern uint8_t _erodata[];
 extern uint8_t _data[];
@@ -8,38 +10,6 @@ extern uint8_t _esdata[];
 extern uint8_t _bss[];
 extern uint8_t _ebss[];
 
-// Adapted from https://stackoverflow.com/questions/58947716/how-to-interact-with-risc-v-csrs-by-using-gcc-c-code
-__attribute__((always_inline)) inline uint32_t csr_mstatus_read(void){
-    uint32_t result;
-    asm volatile ("csrr %0, mstatus" : "=r"(result));
-    return result;
-}
-
-__attribute__((always_inline)) inline void csr_mstatus_write(uint32_t val){
-    asm volatile ("csrw mstatus, %0" : : "r"(val));
-}
-
-__attribute__((always_inline)) inline void csr_write_mie(uint32_t val){
-    asm volatile ("csrw mie, %0" : : "r"(val));
-}
-
-__attribute__((always_inline)) inline void csr_enable_interrupts(void){
-    asm volatile ("csrsi mstatus, 0x8");
-}
-
-__attribute__((always_inline)) inline void csr_disable_interrupts(void){
-    asm volatile ("csrci mstatus, 0x8");
-}
-
-__attribute__((always_inline)) inline uint32_t csr_read_mip(void) {
-    uint32_t result;
-    asm volatile ("csrr %0, mip" : "=r"(result));
-    return result;
-}
-
-__attribute__((always_inline)) inline void csr_write_mip(uint32_t val) {
-    asm volatile ("csrw mip, %0" : : "r"(val));
-} 
 
 #define MTIME_LOW       (*((volatile uint32_t *)0x40000008))
 #define MTIME_HIGH      (*((volatile uint32_t *)0x4000000C))
@@ -86,20 +56,31 @@ void c_interrupt_handler(uint32_t cause){
     MTIMECMP_LOW = NewCompare;
     global++;
     controller_status = CONTROLLER;
+
+    int num2 = 0x123;
+    int num3 = 123;
+    int number = INTERRUPT_PENDING;
+
     if((INTERRUPT_PENDING) & 0x4) { //Cmd interrupt?
         cmd_interrupt++;
         INTERRUPT_PENDING = INTERRUPT_PENDING | 0x4;
+
+        threadYield();
     } else if((INTERRUPT_PENDING) & 0x2) { //Video interrupt?
         if(global % 60 == 0) { //swap colors every 60 frames
             MEDIUM_PALETTE[1] = MEDIUM_PALETTE[1] ^ 0x06B5; 
         }
         INTERRUPT_PENDING = INTERRUPT_PENDING | 0x2;
+    } else if((INTERRUPT_PENDING) & 0xb) {
+        //threadYield();
+        INTERRUPT_PENDING = INTERRUPT_PENDING & 0xb;
     }
 
     csr_enable_interrupts();
 }
 
 uint32_t c_system_call(uint32_t arg0, uint32_t arg1, uint32_t arg2, uint32_t arg3, uint32_t arg4, uint32_t call){
+
     if(1 == call){
         return global;
     }

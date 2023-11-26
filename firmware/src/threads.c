@@ -6,56 +6,83 @@
 
 #include <threading/threads.h>
 #include <core/scheduler.h>
+#include <utils/queue.h>
+#include <stdbool.h>
 
-// If this changes, then change interrupt.s as well
-// Stack pointer needs to be adjusted accordingly
-
+uint32_t threadCounter = 0;
 /**
  * Creates a new thread and adds it to the scheduler
 */
-TCB* threadCreate(TThreadEntry entry, void* param) {
+bool threadCreate(TThreadEntry entry, void* param) {
+    TCB* newThread = malloc(sizeof(TCB));
+    newThread -> threadID = threadCounter;
+    newThread -> stacktop = 0x0;
+    newThread -> stack = calloc(sizeof(uint32_t), 128);
 
-    // Init new TCB
-    TCB* newTCB = malloc(sizeof(TCB));
-    newTCB -> threadID = threadCounter;
-    newTCB -> waitingFor = NONE;
-    newTCB -> waitingItemID = -1;
-    
-    // Don't allocate stack top for main thread
-    if(threadCounter != 0){
-        newTCB -> stacktop = InitThread(newTCB -> stack + 128, entry, param);
+    // If not creating main thread, set stacktop
+    if(threadCounter != 0) {
+            newThread -> stacktop = InitThread(newThread -> stack + 128, threadWrapper, entry, param);
+
     }
+
+    if(queuePush(scheduler -> ready, (void*)newThread) == false) {
+        free(newThread -> stack);
+        free(newThread);
+        return false; // Return false if thread list full
+    }
+
 
     threadCounter++;
-    return newTCB;
+
+    return true;
+
 }
 
-int threadDestroy(TCB* thread) {
-    int threadID = thread -> threadID;
-    free(thread);
-    // Add ID to finished list
-}
+bool threadYield(void) {
 
-int threadYieldCall(void) {
-    TCB* chosenTCB;
-    TCB* finishedTCB;
-
-    // Context Switch
-    if(queueDequeue(scheduler.ready, (void*)&chosenTCB) == 0) {
-        // Nothing to do if there are no other threads on the ready list
-    } else {
-        // Else, move around pointers
-        finishedTCB = scheduler.running;
-        queueEnqueue(scheduler.ready, (void*)finishedTCB);
-        scheduler.running = chosenTCB;
-
-        int num1 = (int)chosenTCB -> stacktop;
-        int num2 = (int)finishedTCB -> stacktop;
-        
-        // Context Switch
-        SwitchThread(&(finishedTCB -> stacktop), chosenTCB -> stacktop);
+    TCB* finishedThread, *chosenThread;
+    if(scheduler -> ready -> size == 0) {
+        return false;
     }
 
-    // This won't ever run?
-    return 0;
+    // Get finished thread
+    queuePop(scheduler -> ready, (void*)&finishedThread);
+
+    // Peek new thread
+    queuePeek(scheduler -> ready, (void*)&chosenThread);
+
+    int number1 = finishedThread -> threadID;
+    int number2 = chosenThread -> threadID;
+
+    // Put finished thread back into ready list at the end
+    queuePush(scheduler -> ready, (void*)finishedThread);
+
+    // Context Switch
+    SwitchThread(&(finishedThread -> stacktop), chosenThread -> stacktop);
+
+    return true;
+}
+
+void threadWrapper(TThreadEntry entry, void* param) {
+
+    entry(param);
+    threadExit();
+
+    return;
+}
+
+void threadExit(void) {
+    // TODO: Disable interrupts
+    TCB* chosenThread, *finishedThread;
+
+    queuePop(scheduler -> ready, (void*)&finishedThread);
+    queuePeek(scheduler -> ready, (void*)&chosenThread);
+
+    free(finishedThread -> stack);
+    free(finishedThread);
+
+
+    StartThread(chosenThread -> stacktop);
+
+    return;
 }

@@ -1,5 +1,5 @@
 .section .text, "ax"
-.global _interrupt_handler, _system_call, InitThread, SwitchThread
+.global _interrupt_handler, _system_call, InitThread, SwitchThread, StartThread
 _interrupt_handler:
     csrw    mscratch,ra
     csrr    ra,mcause
@@ -62,7 +62,7 @@ InitThread:
     sw	    zero,28(a0)
     sw	    zero,24(a0)
     sw	    a2,20(a0)
-    sw	    zero,16(a0)
+    sw	    a3,16(a0) # Changed here
     sw	    zero,12(a0)
     sw	    zero,8(a0)
     sw	    zero,4(a0)
@@ -104,3 +104,22 @@ SwitchThread:
     addi	sp,sp,52
     ret
 
+StartThread:    # Starts a thread without switching context
+                # Ex, if a thread has completed execution
+    mv      sp,a0
+
+    lw	    ra,48(sp)
+    lw	    tp,44(sp)
+    lw	    t0,40(sp)
+    lw	    t1,36(sp)
+    lw	    t2,32(sp)
+    lw	    s0,28(sp)
+    lw	    s1,24(sp)
+    lw	    a0,20(sp)
+    lw	    a1,16(sp)
+    lw	    a2,12(sp)
+    lw	    a3,8(sp)
+    lw	    a4,4(sp)
+    lw	    a5,0(sp)
+    addi	sp,sp,52
+    ret

@@ -17,24 +17,18 @@ void func2(void*);
 
 int max_counter = 1000;
 
-TThreadContext MainThread;
-TCB* threadOne;
-TCB* threadTwo;
 
-void printNum(char*);
 
 int main() {
+
     int a = 4;
     int b = 12;
     int last_global = 42;
 
     initScheduler();
 
-    threadOne = threadCreate(func1, NULL);
-    threadTwo = threadCreate(func2, NULL);
-
-    queueEnqueue(scheduler.ready, (void*)threadOne);
-    queueEnqueue(scheduler.ready, (void*)threadTwo);
+    threadCreate(func1, NULL);
+    threadCreate(func2, NULL);
 
     int counter = 0;
 
@@ -44,17 +38,22 @@ int main() {
     strcpy((char *)VIDEO_MEMORY,Buffer);
     
     //Wait for cartridge 
+    bool flag = false;
     while (1){
         if(*CartridgeStatus & 0x1){
-            FunctionPtr Fun = (FunctionPtr)((*CartridgeStatus) & 0xFFFFFFFC);
-            Fun();
+            FunctionPtr cartridge = (FunctionPtr)((*CartridgeStatus) & 0xFFFFFFFC);
+
+            threadCreate(cartridge, NULL);
+            while (1){
+              threadYield();
+            }
         }
 
         itoa(counter, Buffer, 10);
         strcpy((char *)VIDEO_MEMORY,Buffer);
         counter = (counter + 1) % max_counter;
 
-        threadYieldCall();
+        //threadYield();
     }
 
     return 0;
@@ -86,12 +85,16 @@ char *_sbrk(int numbytes){
 
 void func1(void* num) {
 
+  int number = 12;
+
+  threadExit();
+
   while(1) {
     int num = (int)num;
     num++;
     num++;
 
-    threadYieldCall();
+    threadYield();
   }
 
   return;
@@ -105,7 +108,7 @@ void func2(void* num) {
     num++;
     num++;
 
-    threadYieldCall();
+    threadYield();
   }
   
   return;

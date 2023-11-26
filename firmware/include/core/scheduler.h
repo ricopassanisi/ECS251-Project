@@ -1,31 +1,20 @@
 #include <threading/threads.h>
 #include <stdlib.h>
-#include <utils/myqueue.h>
+#include <utils/queue.h>
+#include <stdbool.h>
 
-#ifndef SCHEDULER_H
-#define SCHEDULER_H
+#pragma once
+
 
 typedef struct Scheduler {
     Queue* ready;
-    Queue* waiting;
     TCB* running;
-    
-    int* finished;
-    
 }Scheduler;
 
-extern Scheduler scheduler;
-extern int MAX_THREADS;
-extern int THREAD_STACK_SIZE;
-extern int threadCounter;
+extern Scheduler* scheduler;
 
-// Queue Sizes
-// Need to be outside of struct because Q -> size returns memory address of struct for some reason
-extern int readySize;
-extern int waitingSize;
-extern int finishedSize;
-
-/* Init Scheduler  with main */
-int initScheduler();
-
-#endif
+/** @brief initialize scheduler with queues and main thread
+ * 
+ * @returns True is successful, false if failed
+*/
+bool initScheduler(void);
