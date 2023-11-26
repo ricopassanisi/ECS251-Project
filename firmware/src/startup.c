@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <sprite.c>
 #include <background.c>
+#include <controller.c>
 
 extern uint8_t _erodata[];
 extern uint8_t _data[];
@@ -124,6 +125,8 @@ uint32_t c_system_call(uint32_t arg0, uint32_t arg1, uint32_t arg2, uint32_t arg
             return load_background(*((background_t*)arg0));
         case 13:
             return delete_background((uint8_t)arg0);
+        case 14:
+        	return get_controller_status(controller_status);
         default:
             return -1;
     }

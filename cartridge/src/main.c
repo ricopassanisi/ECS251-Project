@@ -2,8 +2,10 @@
 #include <stdlib.h>
 #include <sprite.h>
 #include <background.h>
+#include <controller.h>
 
 volatile uint32_t controller_status = 0;
+volatile uint32_t controller_status_value = 0;
 
 
 //Video memory and medium sprite stuff:
@@ -136,7 +138,8 @@ int main() {
         if(global != last_global){
             controller_status = GetController();
             if(controller_status){
-                if(controller_status & 0x1){
+            	controller_status_value = get_controller();
+            	if(controller_status & 0x1){
                     if(x_pos & 0x3F){
                         x_pos--;
                     }
