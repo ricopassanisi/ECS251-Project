@@ -57,3 +57,5 @@ cartridge/bin/*
 firmware/bin/*
 .vscode
 testing
+.DS_Store
+temp
