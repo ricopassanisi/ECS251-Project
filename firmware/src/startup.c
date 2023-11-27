@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <utils/utils.h>
 #include <threading/threads.h>
+#include <threading/locks.h>
 
 extern uint8_t _erodata[];
 extern uint8_t _data[];
@@ -81,15 +82,44 @@ void c_interrupt_handler(uint32_t cause){
 
 uint32_t c_system_call(uint32_t arg0, uint32_t arg1, uint32_t arg2, uint32_t arg3, uint32_t arg4, uint32_t call){
 
-    if(1 == call){
+
+    switch (call)
+    {
+    case 1:
         return global;
-    }
-    else if(2 == call){
+
+    case 2:
         return controller_status;
-    }
-    else if(3 == call) {
+
+    case 3:
         return cmd_interrupt;
+
+        /* Threading Syscalls */
+    case 10:
+        return threadCreate((TThreadEntry) arg0, (void*)arg1);
+
+    case 11:
+        return threadYield();
+
+    case 12:
+        threadExit();
+        return 0;
+
+    case 13:
+        return lockAcquire((Lock*)arg0);
+
+    case 14:
+        return lockRelease((Lock*)arg0);
+
+    case 15:
+        return (uint32_t)lockCreate();
+    
+    default:
+        break;
     }
+
+
+
     return -1;
 
 }

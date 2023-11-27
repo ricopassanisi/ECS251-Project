@@ -8,6 +8,7 @@
 
 typedef struct Scheduler {
     Queue* ready;
+    uint32_t threadID;
     TCB* running;
 }Scheduler;
 

@@ -1,7 +1,7 @@
 /**
  * @file locks.h
  * 
- * Lock system call header file
+ * Locks system calls header files
 */
 
 #pragma once
@@ -15,7 +15,6 @@ typedef struct Lock {
     bool acquired;
 
 }Lock;
-
 
 Lock* lockCreate(void);
 

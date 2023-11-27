@@ -3,6 +3,7 @@
 #include <string.h>
 #include <core/scheduler.h>
 #include <threading/threads.h>
+#include <threading/locks.h>
 
 volatile int global = 42;
 volatile uint32_t controller_status = 0;
@@ -14,6 +15,8 @@ typedef void (*FunctionPtr)(void);
 
 void func1(void*);
 void func2(void*);
+
+Lock newLock;
 
 int max_counter = 1000;
 
@@ -27,8 +30,8 @@ int main() {
 
     initScheduler();
 
-    threadCreate(func1, NULL);
-    threadCreate(func2, NULL);
+    // threadCreate(func1, NULL);
+    // threadCreate(func2, NULL);
 
     int counter = 0;
 
@@ -53,8 +56,10 @@ int main() {
         strcpy((char *)VIDEO_MEMORY,Buffer);
         counter = (counter + 1) % max_counter;
 
-        //threadYield();
+        // threadYield();
     }
+
+    // Some cleanup code here
 
     return 0;
 }
@@ -85,16 +90,20 @@ char *_sbrk(int numbytes){
 
 void func1(void* num) {
 
-  int number = 12;
+  int number = 0;
 
-  threadExit();
+  lockAcquire(&newLock);
+  threadYield();
 
   while(1) {
-    int num = (int)num;
-    num++;
-    num++;
+    number++;
+
+    if(number > 5) {
+      lockRelease(&newLock);
+    }
 
     threadYield();
+
   }
 
   return;
@@ -104,11 +113,16 @@ void func2(void* num) {
 
   int i = 12;
   while(1) {
+
+    lockAcquire(&newLock);
+    // Critical section
+
+    int newnum = 12;
+    lockRelease(&newLock);
     int num = (int)num;
     num++;
     num++;
 
-    threadYield();
   }
   
   return;

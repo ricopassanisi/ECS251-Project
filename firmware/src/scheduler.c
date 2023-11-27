@@ -16,6 +16,7 @@ bool initScheduler(void) {
 
     // Allocate main thread
     threadCreate(NULL, NULL);
+    scheduler -> threadID = 0;
 
     return true;
 }

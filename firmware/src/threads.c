@@ -58,6 +58,7 @@ bool threadYield(void) {
     queuePush(scheduler -> ready, (void*)finishedThread);
 
     // Context Switch
+    scheduler -> threadID = chosenThread -> threadID;
     SwitchThread(&(finishedThread -> stacktop), chosenThread -> stacktop);
 
     return true;
@@ -81,7 +82,7 @@ void threadExit(void) {
     free(finishedThread -> stack);
     free(finishedThread);
 
-
+    scheduler -> threadID = chosenThread -> threadID;
     StartThread(chosenThread -> stacktop);
 
     return;
