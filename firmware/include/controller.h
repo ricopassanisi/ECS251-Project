@@ -11,4 +11,4 @@ typedef enum Button {
     j,
     k
 } Button;
-int get_controller_status(volatile uint32_t controller_status);
+uint32_t get_controller_status(volatile uint32_t controller_status);

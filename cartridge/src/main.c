@@ -5,7 +5,7 @@
 #include <controller.h>
 
 volatile uint32_t controller_status = 0;
-volatile uint32_t controller_status_value = 0;
+uint32_t controller_status_value = 0;
 
 
 //Video memory and medium sprite stuff:
@@ -139,22 +139,22 @@ int main() {
             controller_status = GetController();
             if(controller_status){
             	controller_status_value = get_controller();
-            	if(controller_status & 0x1){
+            	if(controller_status_value == 1){
                     if(x_pos & 0x3F){
                         x_pos--;
                     }
                 }
-                if(controller_status & 0x2){
+                if(controller_status_value == 0){
                     if(x_pos >= 0x40){
                         x_pos -= 0x40;
                     }
                 }
-                if(controller_status & 0x4){
+                if(controller_status_value == 2){
                     if(x_pos < 0x8C0){
                         x_pos += 0x40;
                     }
                 }
-                if(controller_status & 0x8){
+                if(controller_status_value == 3){
                     if((x_pos & 0x3F) != 0x3F){
                         x_pos++;
                     }

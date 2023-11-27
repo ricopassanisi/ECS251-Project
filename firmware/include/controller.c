@@ -1,6 +1,6 @@
 #include <controller.h>
 
-int get_controller_status(volatile uint32_t controller_status) {
+uint32_t get_controller_status(volatile uint32_t controller_status) {
 	if(controller_status){
     	if(controller_status & 0x1){				//left
     		return a;
