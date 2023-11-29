@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <sprite.h>
 #include <background.h>
+#include <threading/threads.h>
+#include <controller.h>
 
 volatile uint32_t controller_status = 0;
 
@@ -14,14 +16,13 @@ volatile uint32_t *MODE_REGISTER = (volatile uint32_t *)(0x500F6780);
 uint32_t GetTicks(void);
 uint32_t GetController(void);
 uint32_t GetCmd(void);
-
+void* malloc_sys(size_t size);
 
 //TEMP USE, DELETE LATER
 uint32_t BackgroundControl_Pixel(uint8_t palette, uint8_t z, uint16_t y, uint16_t x, uint8_t index) {
     //return (((uint32_t)index)<<24) | (((uint32_t)z)<<21) | (((uint32_t)y+32)<<12) | (((uint32_t)x+32)<<2) | (palette & 0x3); (((uint32_t)1)<<31)
     return   (((uint32_t)index)<<29) | (((uint32_t)z)<<22) | ((((uint32_t)y+288))<<12) | ((((uint32_t)x+512))<<2) | (palette & 0x3); 
 }
-
 
 int main() {
     *MODE_REGISTER = 1;
@@ -32,7 +33,9 @@ int main() {
     uint32_t lastCmd = GetCmd();
     // Fill out sprite data
     
-    uint8_t med_square_data[1024]; // = (uint8_t*) malloc(1024*sizeof(uint8_t));
+    //uint8_t * med_square_data = (uint8_t*) malloc(1024*sizeof(uint8_t));
+    uint8_t * med_square_data = (uint8_t*) malloc_sys(1024);
+    //uint8_t med_square_data[1024];
     uint8_t small_square_data[256];
     uint8_t large_square_data[4096];
     //fill medium
@@ -92,7 +95,7 @@ int main() {
         }
     }
 
-    uint32_t sprite_palette[256];
+    uint32_t *sprite_palette = (uint32_t*) malloc_sys(256*sizeof(uint32_t));
     sprite_palette[1] = 0xFFFF06B5; // A R G B
     sprite_palette[2] = 0xFF00FF00; //Green
     sprite_palette[3] = 0xFF0000FF; //Blue
@@ -129,7 +132,9 @@ int main() {
     //MEDIUM_CONTROL[2] = MediumControl(0,100,100,1,2);
     
     int8_t plusMinus = 1;
+    int newCont = get_controller();
     while (1) {
+        threadYield();
         //int c = a + b + global;
         global = GetTicks();
         uint32_t cmd = GetCmd();
@@ -168,6 +173,7 @@ int main() {
                 //MEDIUM_CONTROL[0] = MediumControl(0, (x_pos & 0x3F)<<3, (x_pos>>6)<<3, 0, 0);
                 delete_sprite(id);
                 delete_background(back_id);
+
             }
             if(large_x >= 448) plusMinus = -1;
             if(large_x <= 0) plusMinus = 1;

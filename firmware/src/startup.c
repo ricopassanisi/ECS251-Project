@@ -1,6 +1,10 @@
 #include <stdint.h>
+#include <stdlib.h>
 #include <sprite.c>
 #include <background.c>
+#include <threading/threads.h>
+#include <threading/locks.h>
+#include "../include/controller.h"
 
 extern uint8_t _erodata[];
 extern uint8_t _data[];
@@ -92,7 +96,7 @@ void c_interrupt_handler(uint32_t cause){
             MEDIUM_PALETTE[1] = MEDIUM_PALETTE[1] ^ 0x06B5; 
         }
         INTERRUPT_PENDING = INTERRUPT_PENDING | 0x2;
-    }
+    } 
 }
 
 uint32_t c_system_call(uint32_t arg0, uint32_t arg1, uint32_t arg2, uint32_t arg3, uint32_t arg4, uint32_t call){
@@ -124,6 +128,57 @@ uint32_t c_system_call(uint32_t arg0, uint32_t arg1, uint32_t arg2, uint32_t arg
             return load_background(*((background_t*)arg0));
         case 13:
             return delete_background((uint8_t)arg0);
+
+                /* Threading Syscalls */
+        case 14:
+            return threadCreate((TThreadEntry) arg0, (void*)arg1);
+
+        case 15:
+            return threadYield();
+
+        case 16:
+            threadExit();
+            return 0;
+
+        case 17:
+            return lockAcquire((Lock*)arg0);
+
+        case 18:
+            return lockRelease((Lock*)arg0);
+
+        case 19:
+            return (uint32_t)lockCreate();
+    
+        case 20:
+            if(controller_status){
+            if(controller_status & 0x1){				//left
+                return a;
+            }
+            if(controller_status & 0x2){			//up
+                return w;
+            }
+            if(controller_status & 0x4){		// down
+                return x;
+            }
+            if(controller_status & 0x8){		//right
+                return d;
+            }
+            if(controller_status & 0x10){				//left
+                return u;
+            }
+            if(controller_status & 0x20){			//up
+                return i;
+            }
+            if(controller_status & 0x40){		// down
+                return j;
+            }
+            if(controller_status & 0x80){		//right
+                return k;
+            }
+            return 0;
+	}
+        case 30: //malloc sys?
+            return malloc((size_t)arg0);
         default:
             return -1;
     }

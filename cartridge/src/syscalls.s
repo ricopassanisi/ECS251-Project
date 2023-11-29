@@ -3,7 +3,9 @@
 .global load_sprite_data_sys, load_palette_sys, display_sprite_sys 
 .global delete_sprite_sys, change_sprite_palette_sys, load_background_palette_sys, load_background_data_pixel_sys
 .global load_background_sys, delete_background_sys
-
+.global threadCreate, threadYield, threadExit
+.global get_controller_sys
+.global malloc_sys
 
 GetTicks:
     li a5, 1
@@ -44,4 +46,21 @@ load_background_sys:
 delete_background_sys:
     li a5, 13
     ecall
-    
+
+threadCreate:
+    li a5, 14
+    ecall
+threadYield:
+    li a5, 15
+    ecall
+threadExit:
+    li a5, 16
+    ecall
+
+get_controller_sys:
+    li a5, 20
+    ecall
+
+malloc_sys:
+    li a5, 30
+    ecall

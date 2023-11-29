@@ -1,6 +1,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <core/scheduler.h>
+#include <threading/threads.h>
 
 volatile int global = 42;
 volatile uint32_t controller_status = 0;
@@ -18,15 +20,26 @@ int main() {
     char *Buffer = malloc(32);
     strcpy(Buffer,"OS STARTED");
     strcpy((char *)VIDEO_MEMORY,Buffer);
+
+    /* Initialization Stuff */
+    initScheduler();
     
     //Wait for cartridge 
     while (1){
         if(*CartridgeStatus & 0x1){
-            FunctionPtr Fun = (FunctionPtr)((*CartridgeStatus) & 0xFFFFFFFC);
-            Fun();
+            FunctionPtr cartridge = (FunctionPtr)((*CartridgeStatus) & 0xFFFFFFFC);
+            threadCreate(cartridge, NULL);
+
+            while(threadYield() == true) {
+              ; // Spin while the cartridge thread still exists
+            };
+
+            // Once here, the cartridge has exited
+            break;
         }
     }
-
+    // Cleanup code here...
+    destroyScheduler();
     return 0;
 }
 

@@ -18,6 +18,7 @@ typedef struct sprite_t {
     int16_t x, y, z;
     uint8_t palette, data_index;
 } sprite_t;
+
 //syscall setup:
 uint32_t load_sprite_sys(uint32_t sprite_ptr);
 uint32_t load_sprite_data_sys(uint32_t type, uint32_t data_ptr, uint32_t index);
