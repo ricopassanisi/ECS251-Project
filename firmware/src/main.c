@@ -3,6 +3,7 @@
 #include <string.h>
 #include <core/scheduler.h>
 #include <threading/threads.h>
+#include <mem.c>
 
 volatile int global = 42;
 volatile uint32_t controller_status = 0;
@@ -43,6 +44,7 @@ int main() {
     return 0;
 }
 
+/*
 extern char _heap_base[];
 extern char _stack[];
 
@@ -64,3 +66,4 @@ char *_sbrk(int numbytes){
     return NULL;
   }
 }
+*/

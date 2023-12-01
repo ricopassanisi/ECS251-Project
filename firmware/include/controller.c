@@ -26,8 +26,8 @@ uint32_t get_controller_status(volatile uint32_t controller_status) {
 		if(controller_status & 0x80){		//right
 			return k;
 		}
-
 	}
+	return NONE;
 }
 
 
