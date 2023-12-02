@@ -5,6 +5,7 @@
 .global load_background_sys, delete_background_sys
 .global threadCreate, threadYield, threadExit
 .global get_controller_sys
+.global create_square_sys
 .global malloc_sys
 
 GetTicks:
@@ -63,4 +64,8 @@ get_controller_sys:
 
 malloc_sys:
     li a5, 30
+    ecall
+
+create_square_sys:
+    li a5, 35
     ecall

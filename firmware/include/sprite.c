@@ -189,3 +189,50 @@ uint16_t load_sprite(sprite_t sprite) {
     }
     return -1; //Out of space in the given control
 }
+
+
+//RESERVED SPRITE STUFF:
+// Medium Sprite data 54-63 (10 data sections)
+// Medium Sprite Controls 225-255 (30 control structures)
+
+//Last medium palette reserved for colors, any new color gets filled into most recent open spot
+//Create medium square of given color (base easy to use function), returns the sprite ID
+
+uint16_t create_square(uint32_t color) {
+    volatile uint32_t * palette = (volatile uint32_t *) 0x500F2C00;
+    //PALETTE
+    //determine place to put new color
+    //loop over palette:
+    int color_index;
+    for(int i = 1; i < 256; ++i) {
+        if(palette[i] == color) {
+            color_index = i;
+            break;
+        }
+        if(!palette[i]) { //empty palette space
+            color_index = i;
+            palette[i] = color;
+        }
+    }
+
+    //DATA
+    int data_size = 1024;
+    int data_index;
+    for(int i = 54; i < 64; ++i) {
+        if(!MEDIUM_DATA[(data_size*i)]) { //empty medium data
+            for(int j = 0; j < data_size; ++j) {
+                data_index = i;
+                MEDIUM_DATA[(data_size*i) + j] = color_index;
+            }
+            break;
+        }
+    }
+
+    //CONTROL
+    for(int i = 225; i < 256; ++i) {
+        if(!MEDIUM_CONTROL[i]) { //empty control structure
+            MEDIUM_CONTROL[i] = MediumControl(3,0,0,0,data_index);
+            return (i << 2) | 1;
+        }
+    }
+}

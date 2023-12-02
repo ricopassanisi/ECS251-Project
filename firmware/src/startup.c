@@ -179,6 +179,8 @@ uint32_t c_system_call(uint32_t arg0, uint32_t arg1, uint32_t arg2, uint32_t arg
 	}
         case 30: //malloc sys?
             return malloc((size_t)arg0);
+        case 35: //create_square
+            return create_square(arg0);
         default:
             return -1;
     }

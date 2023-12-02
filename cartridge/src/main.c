@@ -108,6 +108,7 @@ int main()
     sprite_palette[2] = 0xFF00FF00; // Green
     sprite_palette[3] = 0xFF0000FF; // Blue
 
+
     load_palette(MEDIUM, sprite_palette, 0);
     load_palette(SMALL, sprite_palette, 0);
     load_palette(LARGE, sprite_palette, 0);
@@ -140,6 +141,12 @@ int main()
 
     int8_t plusMinus = 1;
     Button controller_status = get_controller();
+    uint16_t square_ids[10];
+    for(int i = 0; i < 10; ++i) {
+        square_ids[i] = create_square(0xFF0000FF);
+        display_sprite(square_ids[i], (34*i),70,1);
+    }
+    
     while (1) {
         threadYield();
         // int c = a + b + global;

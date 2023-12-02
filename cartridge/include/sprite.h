@@ -26,6 +26,7 @@ uint32_t load_palette_sys(uint32_t type, uint32_t palette_ptr, uint32_t index);
 uint32_t display_sprite_sys(uint32_t sprite_id, uint32_t x_off, uint32_t y_off, uint32_t z_off);
 uint32_t delete_sprite_sys(uint32_t sprite_id);
 uint32_t change_sprite_palette_sys(uint32_t sprite_id, uint32_t palette_index);
+uint32_t create_square_sys(uint32_t color);
 //functions:
 
 //Wrappers for system calls
@@ -53,3 +54,6 @@ int change_sprite_palette(int16_t sprite_id, uint8_t palette_index) {
   return change_sprite_palette_sys((uint32_t) sprite_id, (uint32_t) palette_index);
 }
 
+uint16_t create_square(uint32_t color) {
+  return create_square_sys(color);
+}
