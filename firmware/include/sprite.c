@@ -1,5 +1,5 @@
 #include <sprite.h>
-
+#include <core/video.h>
 //Sprite ID description
 /* bit | 16 .. 10 | 9 .. 2 | 1 .. 0 |
 * -----------------------------------
@@ -30,22 +30,35 @@ uint32_t LargeControl(uint8_t palette, int16_t x, int16_t y, uint8_t z, uint8_t 
 * Uses a similar method as the control functions but keeps the original index and palette values
 */
 int16_t display_sprite(uint16_t sprite_id, uint16_t x_off, uint16_t y_off, uint8_t z_off) {
+    video_buf buffer;
+    buffer.num_bytes = 0;
+    buffer.num_words = 1;
+    uint32_t *val = malloc(sizeof(uint32_t));
+    //uint32_t val[1];
     switch(sprite_id & 0b11) {
         case 0b00: //small
             if(!SMALL_CONTROL[(sprite_id >> 2)]) return -1; //Sprite id does not exist
-            SMALL_CONTROL[(sprite_id >> 2)] = ((uint32_t)(SMALL_CONTROL[(sprite_id >> 2)] & 0xFF000003)) | (((uint32_t)z_off)<<21) | (((uint32_t)y_off+16)<<12) | (((uint32_t)x_off+16)<<2);
+            val[0] = ((uint32_t)(SMALL_CONTROL[(sprite_id >> 2)] & 0xFF000003)) | (((uint32_t)z_off)<<21) | (((uint32_t)y_off+16)<<12) | (((uint32_t)x_off+16)<<2);
+            buffer.video_mem32 =  (SMALL_CONTROL + (sprite_id >> 2));
+            //SMALL_CONTROL[(sprite_id >> 2)] = ((uint32_t)(SMALL_CONTROL[(sprite_id >> 2)] & 0xFF000003)) | (((uint32_t)z_off)<<21) | (((uint32_t)y_off+16)<<12) | (((uint32_t)x_off+16)<<2);
             break;
         case 0b01: //med
             if(!MEDIUM_CONTROL[(sprite_id >> 2)]) return -1; //Sprite id does not exist
-            MEDIUM_CONTROL[(sprite_id >> 2)] = ((uint32_t)(MEDIUM_CONTROL[(sprite_id >> 2)] & 0xFF000003)) | (((uint32_t)z_off)<<21) | (((uint32_t)y_off+32)<<12) | (((uint32_t)x_off+32)<<2);
+            val[0] = ((uint32_t)(MEDIUM_CONTROL[(sprite_id >> 2)] & 0xFF000003)) | (((uint32_t)z_off)<<21) | (((uint32_t)y_off+32)<<12) | (((uint32_t)x_off+32)<<2);
+            buffer.video_mem32 =  (MEDIUM_CONTROL + (sprite_id >> 2));
+            //MEDIUM_CONTROL[(sprite_id >> 2)] = ((uint32_t)(MEDIUM_CONTROL[(sprite_id >> 2)] & 0xFF000003)) | (((uint32_t)z_off)<<21) | (((uint32_t)y_off+32)<<12) | (((uint32_t)x_off+32)<<2);
             break;
         case 0b10: //large
             if(!LARGE_CONTROL[(sprite_id >> 2)]) return -1; //Sprite id does not exist
-            LARGE_CONTROL[(sprite_id >> 2)] = ((uint32_t)(LARGE_CONTROL[(sprite_id >> 2)] & 0xFF000003)) | (((uint32_t)z_off)<<21) | (((uint32_t)y_off+64)<<12) | (((uint32_t)x_off+64)<<2);
+            val[0] = ((uint32_t)(LARGE_CONTROL[(sprite_id >> 2)] & 0xFF000003)) | (((uint32_t)z_off)<<21) | (((uint32_t)y_off+64)<<12) | (((uint32_t)x_off+64)<<2);
+            buffer.video_mem32 =  (LARGE_CONTROL + (sprite_id >> 2));
+            //LARGE_CONTROL[(sprite_id >> 2)] = ((uint32_t)(LARGE_CONTROL[(sprite_id >> 2)] & 0xFF000003)) | (((uint32_t)z_off)<<21) | (((uint32_t)y_off+64)<<12) | (((uint32_t)x_off+64)<<2);
             break;
         default:
             return -1; //something went very wrong
     }
+    buffer.words = val;
+    add_to_video_queue(buffer);
     return 0;
 }
 
@@ -54,19 +67,29 @@ int16_t display_sprite(uint16_t sprite_id, uint16_t x_off, uint16_t y_off, uint8
 */
 int delete_sprite(int16_t sprite_id) {
     int index = sprite_id >> 2;
+    video_buf buffer;
+    buffer.num_bytes = 0;
+    buffer.num_words = 1;
+    uint32_t *val = malloc(sizeof(uint32_t)); //yes this causes a memory leak, idk how to fix it yet
+    val[0] = 0;
+    buffer.words = val;
     switch(sprite_id & 0b11) {
         case 0b00: //small
-            SMALL_CONTROL[index] = 0;
+            buffer.video_mem32 = SMALL_CONTROL + index;
+            //SMALL_CONTROL[index] = 0;
             break;
         case 0b01: //med
-            MEDIUM_CONTROL[index] = 0;
+            buffer.video_mem32 = MEDIUM_CONTROL + index;
+            //MEDIUM_CONTROL[index] = 0;
             break;
         case 0b10: //large
-            LARGE_CONTROL[index] = 0;
+            buffer.video_mem32 = LARGE_CONTROL + index;
+            //LARGE_CONTROL[index] = 0;
             break;
         default:
             return -1; //something went very wrong
     }
+    add_to_video_queue(buffer);
     return 0;
 }
 
@@ -98,30 +121,44 @@ int change_sprite_palette(int16_t sprite_id, uint8_t palette_index) {
 */
 int8_t load_sprite_data(SPRITE_TYPE type, uint8_t * data, uint8_t index) {
     uint16_t data_size;
+    video_buf buffer;
+    buffer.num_words = 0;
+    buffer.words = NULL;
     switch(type) {
         case SMALL:
             data_size = 256;
-            for(int i = 0; i < data_size; ++i) {
+            buffer.num_bytes = data_size;
+            buffer.bytes = data;
+            buffer.video_mem8 = SMALL_DATA + (data_size*index);
+            /*for(int i = 0; i < data_size; ++i) {
                 SMALL_DATA[(data_size*index)+i] = data[i];
-            }
+            } */
             break;
         case MEDIUM:
             data_size = 1024;
             if(index > 63) return -1; //Cannot go out of med size data section
-            for(int i = 0; i < data_size; ++i) {
-                MEDIUM_DATA[(data_size*index)+i] = data[i];
-            }
+            buffer.num_bytes = data_size;
+            buffer.bytes = data;
+            buffer.video_mem8 = MEDIUM_DATA + (data_size*index);
+            //for(int i = 0; i < data_size; ++i) {
+            //    MEDIUM_DATA[(data_size*index)+i] = data[i];
+            //}
             break;
         case LARGE:
             data_size = 4096;
             if(index > 63) return -1; //Cannot go out of large size data section
-            for(int i = 0; i < data_size; ++i) {
-                LARGE_DATA[(data_size*index)+i] = data[i];
-            }
+            buffer.num_bytes = data_size;
+            buffer.bytes = data;
+            buffer.video_mem8 = LARGE_DATA + (data_size*index);
+            //for(int i = 0; i < data_size; ++i) {
+            //    LARGE_DATA[(data_size*index)+i] = data[i];
+            //}
             break;
         default:
             return -1; //something went very wrong
     }
+
+    add_to_video_queue(buffer);
     return 0;
 }
 
@@ -130,26 +167,35 @@ int8_t load_sprite_data(SPRITE_TYPE type, uint8_t * data, uint8_t index) {
 */
 int8_t load_palette(SPRITE_TYPE type, uint32_t * palette, uint8_t index) {
     int numColors = 256;
+    video_buf buffer;
+    buffer.num_bytes = 0;
+    buffer.bytes = NULL;
+    buffer.num_words = numColors;
+    buffer.words = palette;
     switch(type) {
         //copy palette data from palette into specified palette.
         case SMALL:
-            for(int i = 0; i < numColors; ++i) {
+            buffer.video_mem32 = SMALL_PALETTE + (numColors*index);
+            /*for(int i = 0; i < numColors; ++i) {
                 SMALL_PALETTE[(numColors*index) + i] = palette[i];
-            }
+            }*/
             break;
         case MEDIUM:
-            for(int i = 0; i < numColors; ++i) {
-                MEDIUM_PALETTE[(numColors*index) + i] = palette[i];
-            }
+            buffer.video_mem32 = MEDIUM_PALETTE + (numColors*index);
+            //for(int i = 0; i < numColors; ++i) {
+            //    MEDIUM_PALETTE[(numColors*index) + i] = palette[i];
+            //}
             break;
         case LARGE:
-            for(int i = 0; i < numColors; ++i) {
-                LARGE_PALETTE[(numColors*index) + i] = palette[i];
-            }
+            buffer.video_mem32 = LARGE_PALETTE + (numColors*index);
+            //for(int i = 0; i < numColors; ++i) {
+             //   LARGE_PALETTE[(numColors*index) + i] = palette[i];
+            //}
             break;
         default:
             return -1; //something went very wrong
     }
+    add_to_video_queue(buffer);
     return 0;
 }
 
@@ -158,12 +204,22 @@ int8_t load_palette(SPRITE_TYPE type, uint32_t * palette, uint8_t index) {
 */
 uint16_t load_sprite(sprite_t sprite) {
     uint8_t sprite_id = 0;
+    video_buf buffer;
+    uint32_t ctrl;
+    buffer.num_bytes = 0;
+    buffer.num_words = 1;
+    uint32_t *val = malloc(sizeof(uint32_t));
+    buffer.bytes = NULL;
     switch(sprite.type) {
         //Find an unfilled section in the control and load it using the control helper functions
         case SMALL:
             for(int i = 0; i < 256; ++i) {
                 if(!SMALL_CONTROL[i]) { //unfilled section
-                    SMALL_CONTROL[i] = SmallControl(sprite.palette, sprite.x, sprite.y, sprite.z, sprite.data_index);
+                    val[0] = SmallControl(sprite.palette, sprite.x, sprite.y, sprite.z, sprite.data_index);
+                    buffer.words = val;
+                    buffer.video_mem32 = SMALL_CONTROL + i;
+                    add_to_video_queue(buffer);
+                    //SMALL_CONTROL[i] = SmallControl(sprite.palette, sprite.x, sprite.y, sprite.z, sprite.data_index);
                     return (i << 2);
                 }
             }
@@ -171,7 +227,11 @@ uint16_t load_sprite(sprite_t sprite) {
         case MEDIUM:
             for(int i = 0; i < 256; ++i) {
                 if(!MEDIUM_CONTROL[i]) { //unfilled
-                    MEDIUM_CONTROL[i] = MediumControl(sprite.palette, sprite.x, sprite.y, sprite.z, sprite.data_index);
+                    val[0] = MediumControl(sprite.palette, sprite.x, sprite.y, sprite.z, sprite.data_index);
+                    buffer.words = val;
+                    buffer.video_mem32 = MEDIUM_CONTROL + i;
+                    add_to_video_queue(buffer);
+                    //MEDIUM_CONTROL[i] = MediumControl(sprite.palette, sprite.x, sprite.y, sprite.z, sprite.data_index);
                     return (i << 2) | 1;
                 }
             }
@@ -179,7 +239,11 @@ uint16_t load_sprite(sprite_t sprite) {
         case LARGE:
             for(int i = 0; i < 256; ++i) {
                 if(!LARGE_CONTROL[i]) { //unfilled
-                    LARGE_CONTROL[i] = LargeControl(sprite.palette, sprite.x, sprite.y, sprite.z, sprite.data_index);
+                    val[0] = LargeControl(sprite.palette, sprite.x, sprite.y, sprite.z, sprite.data_index);
+                    buffer.words = val;
+                    buffer.video_mem32 = LARGE_CONTROL + i;
+                    add_to_video_queue(buffer);
+                    //LARGE_CONTROL[i] = LargeControl(sprite.palette, sprite.x, sprite.y, sprite.z, sprite.data_index);
                     return (i << 2) | 2;
                 }
             }

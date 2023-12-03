@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <sprite.c>
 #include <background.c>
+#include "video.c"
 #include <threading/threads.h>
 #include <threading/locks.h>
 #include "../include/controller.h"
@@ -79,31 +80,34 @@ void init(void){
 extern volatile int global;
 extern volatile uint32_t controller_status;
 extern volatile uint32_t cmd_interrupt;
-extern volatile uint32_t *MEDIUM_PALETTE;
+//extern volatile uint32_t *MEDIUM_PALETTE;
 
 void c_interrupt_handler(uint32_t cause){
-    uint64_t NewCompare = (((uint64_t)MTIMECMP_HIGH)<<32) | MTIMECMP_LOW;
-    NewCompare += 100;
-    MTIMECMP_HIGH = NewCompare>>32;
-    MTIMECMP_LOW = NewCompare;
-    global++;
-    controller_status = CONTROLLER;
+    
     if((INTERRUPT_PENDING) & 0x4) { //Cmd interrupt?
         cmd_interrupt++;
         INTERRUPT_PENDING = INTERRUPT_PENDING | 0x4;
     } else if((INTERRUPT_PENDING) & 0x2) { //Video interrupt?
-        if(global % 60 == 0) { //swap colors every 60 frames
-            MEDIUM_PALETTE[1] = MEDIUM_PALETTE[1] ^ 0x06B5; 
-        }
+        //write all video memory
+        load_video_data();
+        clear_video_queue();
+        //clear pending bit
         INTERRUPT_PENDING = INTERRUPT_PENDING | 0x2;
-    } 
+    } else { //Assume any other is a timer interrupt
+        uint64_t NewCompare = (((uint64_t)MTIMECMP_HIGH)<<32) | MTIMECMP_LOW;
+        NewCompare += 100;
+        MTIMECMP_HIGH = NewCompare>>32;
+        MTIMECMP_LOW = NewCompare;
+        global++;
+        controller_status = CONTROLLER;
+    }
 }
 
 uint32_t c_system_call(uint32_t arg0, uint32_t arg1, uint32_t arg2, uint32_t arg3, uint32_t arg4, uint32_t call){
     switch(call) {
         case 1:
             return global;
-        case 2:
+        case 2: //clear cmd_interrupt
             return controller_status;
         case 3:
             return cmd_interrupt;

@@ -23,7 +23,7 @@ int main()
     int global = GetTicks();
     int last_global = global;
     int glob_init = global;
-    int x_pos = 0;
+    
     uint32_t lastCmd = GetCmd();
     // Fill out sprite data
 
@@ -132,12 +132,7 @@ int main()
     display_sprite(small_id, 200, 50, 1);
     display_sprite(large_id, large_x, large_y, 0);
 
-    // BACKGROUND_CONTROLS[0] = BackgroundControl_Pixel(0,0,0,0,0);
 
-    // BACKGROUND_CONTROLS[1] = (((uint32_t)288)<<12) | (((uint32_t)512)<<2) | 0;
-    // MEDIUM_CONTROL[0] = MediumControl(0, 0, 0, 0, 0);
-    // MEDIUM_CONTROL[1] = MediumControl(0,50,50,1,1); //pallete, x, y, z, index
-    // MEDIUM_CONTROL[2] = MediumControl(0,100,100,1,2);
 
     int8_t plusMinus = 1;
     Button controller_status = get_controller();
@@ -146,7 +141,9 @@ int main()
         square_ids[i] = create_square(0xFF0000FF);
         display_sprite(square_ids[i], (34*i),70,1);
     }
-    
+    int x_pos = 0;
+    int last_x_pos = x_pos;
+    display_sprite(small_id, 200, 50, 1);
     while (1) {
         threadYield();
         // int c = a + b + global;
@@ -179,11 +176,14 @@ int main()
             default:
                 break;
             }
-            display_sprite(id, (x_pos & 0x3F) << 3, (x_pos >> 6) << 3, 0);
+            if(x_pos != last_x_pos) {
+                last_x_pos = x_pos;
+                display_sprite(id, (x_pos & 0x3F) << 3, (x_pos >> 6) << 3, 0);
+            }
         }
         if (cmd != lastCmd) { // reset position if cmd pressed
             lastCmd = cmd;
-            x_pos = 40;
+            // x_pos = 40;
             // VIDEO_MEMORY[x_pos] = 'X';
             // MEDIUM_CONTROL[0] = MediumControl(0, (x_pos & 0x3F)<<3, (x_pos>>6)<<3, 0, 0);
             delete_sprite(id);
