@@ -116,11 +116,11 @@ SwitchThread:
     lw	    a5,0(sp)
     addi	sp,sp,52
 
-    
+    csrsi mstatus, 0x8  # Enable Interrupts
     ret
 
-StartThread:    # Starts a thread without switching context
-                # Ex, if a thread has completed execution
+StartThread:            # Starts a thread without switching context
+                        # Ex, if a thread has completed execution
     mv      sp,a0
 
     mv      gp, a1      # Set global pointer back to cartridge
@@ -140,6 +140,7 @@ StartThread:    # Starts a thread without switching context
     lw	    a5,0(sp)
     addi	sp,sp,52
 
+    csrsi mstatus, 0x8
     ret
 
 
