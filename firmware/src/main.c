@@ -13,11 +13,6 @@ volatile char *VIDEO_MEMORY = (volatile char *)(0x50000000 + 0xF4800);
 volatile uint32_t *CartridgeStatus = (volatile uint32_t *)(0x4000001C);
 typedef void (*FunctionPtr)(void);
 
-void func1(void*);
-void func2(void*);
-
-Lock newLock;
-
 int max_counter = 1000;
 
 
@@ -46,10 +41,7 @@ int main() {
         if(*CartridgeStatus & 0x1){
             FunctionPtr cartridge = (FunctionPtr)((*CartridgeStatus) & 0xFFFFFFFC);
 
-            threadCreate(cartridge, NULL);
-            while (1){
-              threadYield();
-            }
+            cartridge();
         }
 
         itoa(counter, Buffer, 10);
@@ -85,45 +77,4 @@ char *_sbrk(int numbytes){
     return NULL;
   }
 
-}
-
-
-void func1(void* num) {
-
-  int number = 0;
-
-  lockAcquire(&newLock);
-  threadYield();
-
-  while(1) {
-    number++;
-
-    if(number > 5) {
-      lockRelease(&newLock);
-    }
-
-    threadYield();
-
-  }
-
-  return;
-}
-
-void func2(void* num) {
-
-  int i = 12;
-  while(1) {
-
-    lockAcquire(&newLock);
-    // Critical section
-
-    int newnum = 12;
-    lockRelease(&newLock);
-    int num = (int)num;
-    num++;
-    num++;
-
-  }
-  
-  return;
 }

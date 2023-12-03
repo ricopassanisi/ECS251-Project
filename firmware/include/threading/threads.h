@@ -17,8 +17,8 @@ typedef uint32_t *TThreadContext;
  * Function Defined in interrupt.s
 */
 TThreadContext InitThread(uint32_t* stacktop, TThreadEntry threadWrapper, void *param, TThreadEntry entry);
-void SwitchThread(TThreadContext* oldStacktop, TThreadContext newStacktop);
-void StartThread(TThreadContext newStacktop);
+void SwitchThread(TThreadContext* oldStacktop, TThreadContext newStacktop, uint32_t threadSP, uint32_t cartgp);
+void StartThread(TThreadContext newStacktop, uint32_t cartgp);
 
 
 typedef struct TCB {
@@ -41,12 +41,14 @@ extern uint32_t threadCounter;
 */
 bool threadCreate(TThreadEntry entry, void* param);
 
-/** @brief Yields thread and does a context switch with next ready threade
+/** @brief Yields thread and does a context switch with next ready thread
+ * 
+ * @param threadSP Stack Pointer for thread that is yielding
  * 
  * @returns true if yield successful, false if there are no other threads on ready
  * list
 */
-bool threadYield(void);
+bool threadYield(uint32_t threadSP);
 
 /** @brief stub for threads
  * 

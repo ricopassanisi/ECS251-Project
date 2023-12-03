@@ -66,7 +66,6 @@ void c_interrupt_handler(uint32_t cause){
         cmd_interrupt++;
         INTERRUPT_PENDING = INTERRUPT_PENDING | 0x4;
 
-        threadYield();
     } else if((INTERRUPT_PENDING) & 0x2) { //Video interrupt?
         if(global % 60 == 0) { //swap colors every 60 frames
             MEDIUM_PALETTE[1] = MEDIUM_PALETTE[1] ^ 0x06B5; 
@@ -80,11 +79,16 @@ void c_interrupt_handler(uint32_t cause){
     csr_enable_interrupts();
 }
 
+uint32_t cartridgeGP;
+
 uint32_t c_system_call(uint32_t arg0, uint32_t arg1, uint32_t arg2, uint32_t arg3, uint32_t arg4, uint32_t call){
 
 
     switch (call)
     {
+    case 0:
+        cartridgeGP = arg0;
+        return 0x0;
     case 1:
         return global;
 
@@ -99,7 +103,7 @@ uint32_t c_system_call(uint32_t arg0, uint32_t arg1, uint32_t arg2, uint32_t arg
         return threadCreate((TThreadEntry) arg0, (void*)arg1);
 
     case 11:
-        return threadYield();
+        return threadYield(arg0);
 
     case 12:
         threadExit();

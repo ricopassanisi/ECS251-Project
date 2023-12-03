@@ -8,6 +8,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <threading/threads.h>
 
 
 typedef struct Lock {
@@ -33,4 +34,12 @@ bool lockAcquire(Lock* lock);
  * @returns true if lock released, false if failed
 */
 bool lockRelease(Lock* lock);
+
+bool lockAcquireLoop(Lock* lock) {
+    while(lockAcquire(lock) == false) {
+        threadYield();
+    }
+
+    return true;
+}
 

@@ -1,5 +1,6 @@
 .section .text, "ax"
 .global _interrupt_handler, _system_call, InitThread, SwitchThread, StartThread
+.global _setGP
 _interrupt_handler:
     csrw    mscratch,ra
     csrr    ra,mcause
@@ -62,7 +63,7 @@ InitThread:
     sw	    zero,28(a0)
     sw	    zero,24(a0)
     sw	    a2,20(a0)
-    sw	    a3,16(a0) # Changed here
+    sw	    a3,16(a0) # Changed here for threadwrapper
     sw	    zero,12(a0)
     sw	    zero,8(a0)
     sw	    zero,4(a0)
@@ -70,8 +71,18 @@ InitThread:
     ret
     
 SwitchThread:
+    # move arg0 stack pointer to here
+    # c_system_call overwrites some things
+    # Setting stack pointer to exactly what it was when syscall invoked
+    mv      sp, a2
+
     addi	sp,sp,-52
-    sw	    ra,48(sp)
+    
+    #sw	    ra,48(sp)
+    # Storing mepc as ra
+    csrr    a2, mepc
+    sw      a2, 48(sp)
+    
     sw	    tp,44(sp)
     sw	    t0,40(sp)
     sw	    t1,36(sp)
@@ -88,6 +99,8 @@ SwitchThread:
     sw      sp,0(a0)
     mv      sp,a1
 
+    mv      gp, a3      # Set global pointer back to cartridge
+
     lw	    ra,48(sp)
     lw	    tp,44(sp)
     lw	    t0,40(sp)
@@ -102,12 +115,16 @@ SwitchThread:
     lw	    a4,4(sp)
     lw	    a5,0(sp)
     addi	sp,sp,52
+
+    
     ret
 
 StartThread:    # Starts a thread without switching context
                 # Ex, if a thread has completed execution
     mv      sp,a0
 
+    mv      gp, a1      # Set global pointer back to cartridge
+
     lw	    ra,48(sp)
     lw	    tp,44(sp)
     lw	    t0,40(sp)
@@ -122,4 +139,16 @@ StartThread:    # Starts a thread without switching context
     lw	    a4,4(sp)
     lw	    a5,0(sp)
     addi	sp,sp,52
+
+    ret
+
+
+#
+# Loads Firmware Global Pointer
+#
+_setGP:
+    .option push
+    .option norelax
+    la gp, __global_pointer$
+    .option pop
     ret

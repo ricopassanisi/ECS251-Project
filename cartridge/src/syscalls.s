@@ -9,6 +9,7 @@ threadCreate:
     ecall
 
 threadYield:
+    mv a0, sp   # Move stack pointer for yielding
     li a5, 11
     ecall
 

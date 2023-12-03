@@ -22,21 +22,19 @@ Lock* lockCreate(void) {
     return newLock;
 }
 bool lockAcquire(Lock* lock){
-    int number = lock -> holderID;
-    // Check if current thread holds lock
-    if(lock -> holderID == scheduler -> threadID && lock -> acquired == true) {
-        return false; // Can't acquire a lock that is acquired and owned by current thread
+
+    if(lock -> holderID == scheduler -> threadID) {
+        lock -> acquired = true;
+        return true;
     }
 
-    // Spin until lock is free
-    while(lock -> acquired == true) {
-        threadYield();
+    // Lock unowned
+    if(lock -> acquired == false) {
+        lock -> holderID = true;
+        return true;
     }
 
-    lock -> acquired = true;
-    lock -> holderID = scheduler -> threadID;                   
-
-    return true;
+    return false;
 }
 
 

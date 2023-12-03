@@ -8,6 +8,9 @@
 #include <core/scheduler.h>
 #include <utils/queue.h>
 #include <stdbool.h>
+#include <utils/utils.h>
+
+void _setGP(void);
 
 uint32_t threadCounter = 0;
 /**
@@ -38,10 +41,10 @@ bool threadCreate(TThreadEntry entry, void* param) {
 
 }
 
-bool threadYield(void) {
+bool threadYield(uint32_t threadSP) {
 
     TCB* finishedThread, *chosenThread;
-    if(scheduler -> ready -> size == 0) {
+    if(scheduler -> ready -> size <= 1) {
         return false;
     }
 
@@ -51,15 +54,12 @@ bool threadYield(void) {
     // Peek new thread
     queuePeek(scheduler -> ready, (void*)&chosenThread);
 
-    int number1 = finishedThread -> threadID;
-    int number2 = chosenThread -> threadID;
-
     // Put finished thread back into ready list at the end
     queuePush(scheduler -> ready, (void*)finishedThread);
 
     // Context Switch
     scheduler -> threadID = chosenThread -> threadID;
-    SwitchThread(&(finishedThread -> stacktop), chosenThread -> stacktop);
+    SwitchThread(&(finishedThread -> stacktop), chosenThread -> stacktop, threadSP, cartridgeGP);
 
     return true;
 }
@@ -67,6 +67,8 @@ bool threadYield(void) {
 void threadWrapper(TThreadEntry entry, void* param) {
 
     entry(param);
+
+    _setGP(); // set firmware global pointer before proceeding
     threadExit();
 
     return;
@@ -83,7 +85,7 @@ void threadExit(void) {
     free(finishedThread);
 
     scheduler -> threadID = chosenThread -> threadID;
-    StartThread(chosenThread -> stacktop);
+    StartThread(chosenThread -> stacktop, cartridgeGP);
 
     return;
 }
