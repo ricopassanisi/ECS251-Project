@@ -7,24 +7,23 @@
 #include <mem.h>
 
 volatile uint32_t controller_status = 0;
-
+volatile uint32_t *MODE_REGISTER = (volatile uint32_t *)(0x500F6780);
 // Video memory and medium sprite stuff:
 // volatile char *VIDEO_MEMORY = (volatile char *)(0x50000000 + 0xF4800);
-volatile uint32_t *MODE_REGISTER = (volatile uint32_t *)(0x500F6780);
+
 
 // Syscall setup
 uint32_t GetTicks(void);
 uint32_t GetCmd(void);
-
+uint32_t clear_cmd(void);
 
 int main()
 {
-    *MODE_REGISTER = 1;
+    *MODE_REGISTER = 1; //Move into graphics mode
     int global = GetTicks();
     int last_global = global;
     int glob_init = global;
     
-    uint32_t lastCmd = GetCmd();
     // Fill out sprite data
 
     // uint8_t * med_square_data = (uint8_t*) malloc(1024*sizeof(uint8_t));
@@ -151,7 +150,7 @@ int main()
         uint32_t cmd = GetCmd();
         if (global != last_global) {
             controller_status = get_controller();
-
+            
             switch (controller_status) {
             case w:
                 if (x_pos >= 0x40) {
@@ -181,11 +180,8 @@ int main()
                 display_sprite(id, (x_pos & 0x3F) << 3, (x_pos >> 6) << 3, 0);
             }
         }
-        if (cmd != lastCmd) { // reset position if cmd pressed
-            lastCmd = cmd;
-            // x_pos = 40;
-            // VIDEO_MEMORY[x_pos] = 'X';
-            // MEDIUM_CONTROL[0] = MediumControl(0, (x_pos & 0x3F)<<3, (x_pos>>6)<<3, 0, 0);
+        if (cmd) { // reset position if cmd pressed
+            clear_cmd();
             delete_sprite(id);
             delete_background(back_id);
         }

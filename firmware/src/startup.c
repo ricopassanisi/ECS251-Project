@@ -85,7 +85,7 @@ extern volatile uint32_t cmd_interrupt;
 void c_interrupt_handler(uint32_t cause){
     
     if((INTERRUPT_PENDING) & 0x4) { //Cmd interrupt?
-        cmd_interrupt++;
+        cmd_interrupt = 1;
         INTERRUPT_PENDING = INTERRUPT_PENDING | 0x4;
     } else if((INTERRUPT_PENDING) & 0x2) { //Video interrupt?
         //write all video memory
@@ -108,7 +108,8 @@ uint32_t c_system_call(uint32_t arg0, uint32_t arg1, uint32_t arg2, uint32_t arg
         case 1:
             return global;
         case 2: //clear cmd_interrupt
-            return controller_status;
+            cmd_interrupt = 0;
+            return 0;
         case 3:
             return cmd_interrupt;
         case 4:

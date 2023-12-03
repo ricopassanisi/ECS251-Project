@@ -98,22 +98,35 @@ int delete_sprite(int16_t sprite_id) {
 */
 int change_sprite_palette(int16_t sprite_id, uint8_t palette_index) {
     int index = sprite_id >> 2;
+    video_buf buffer;
+    buffer.num_bytes = 0;
+    buffer.num_words = 1;
+    buffer.bytes = NULL;
+    uint32_t * val = (uint32_t*) malloc(sizeof(uint32_t));
     switch(sprite_id & 0b11) {
         case 0b00: //small
             if(!SMALL_CONTROL[(sprite_id >> 2)]) return -1; //Sprite id does not exist
-            SMALL_CONTROL[index] = (SMALL_CONTROL[index] & 0b00) | (palette_index & 0b11);
+            val[0] = (SMALL_CONTROL[index] & 0b00) | (palette_index & 0b11);
+            buffer.video_mem32 = SMALL_CONTROL + index;
+            //SMALL_CONTROL[index] = (SMALL_CONTROL[index] & 0b00) | (palette_index & 0b11);
             break;
         case 0b01: //med
             if(!MEDIUM_CONTROL[(sprite_id >> 2)]) return -1; //Sprite id does not exist
-            MEDIUM_CONTROL[index] = (MEDIUM_CONTROL[index] & 0b00) | (palette_index & 0b11);
+            val[0] = (SMALL_CONTROL[index] & 0b00) | (palette_index & 0b11);
+            buffer.video_mem32 = MEDIUM_CONTROL + index;
+            //MEDIUM_CONTROL[index] = (MEDIUM_CONTROL[index] & 0b00) | (palette_index & 0b11);
             break;
         case 0b10: //large
             if(!LARGE_CONTROL[(sprite_id >> 2)]) return -1; //Sprite id does not exist
-            LARGE_CONTROL[index] = (LARGE_CONTROL[index] & 0b00) | (palette_index & 0b11);
+            val[0] = (SMALL_CONTROL[index] & 0b00) | (palette_index & 0b11);
+            buffer.video_mem32 = LARGE_CONTROL + index;
+            //LARGE_CONTROL[index] = (LARGE_CONTROL[index] & 0b00) | (palette_index & 0b11);
             break;
         default:
             return -1; //something went very wrong
     }
+    add_to_video_queue(buffer);
+    return 0;
 }
 
 /*
@@ -171,7 +184,11 @@ int8_t load_palette(SPRITE_TYPE type, uint32_t * palette, uint8_t index) {
     buffer.num_bytes = 0;
     buffer.bytes = NULL;
     buffer.num_words = numColors;
-    buffer.words = palette;
+    uint32_t * palette_temp = (uint32_t*) malloc(numColors*sizeof(uint32_t));
+    for(int i = 0; i < numColors; ++i) {
+        palette_temp[i] = palette[i];
+    }
+    buffer.words = palette_temp;
     switch(type) {
         //copy palette data from palette into specified palette.
         case SMALL:
@@ -267,6 +284,11 @@ uint16_t create_square(uint32_t color) {
     //PALETTE
     //determine place to put new color
     //loop over palette:
+    video_buf palette_buf, data_buf, ctrl_buf;
+    palette_buf.num_bytes = 0;
+    palette_buf.num_words = 1;
+    uint32_t * palette_val = (uint32_t*) malloc(sizeof(uint32_t));
+    palette_val[0] = color;
     int color_index;
     for(int i = 1; i < 256; ++i) {
         if(palette[i] == color) {
@@ -275,7 +297,10 @@ uint16_t create_square(uint32_t color) {
         }
         if(!palette[i]) { //empty palette space
             color_index = i;
+            palette_buf.video_mem32 = palette + i;
+            //add_to_video_queue(palette_buf);
             palette[i] = color;
+            break;
         }
     }
 

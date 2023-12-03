@@ -17,12 +17,10 @@ void load_video_data() {
         }
         
         
-        
         for(int i = 0; i < buffer.num_words; ++i) {
             buffer.video_mem32[i] = buffer.words[i];
         }
         
-
         head = head->next;
     }
 
@@ -35,13 +33,19 @@ void add_to_video_queue(video_buf buf) {
         video_queue->data = buf;
         video_queue->next = NULL;
     } else {
-        vid_node * head = video_queue;
-        while(head->next != NULL) { //find next empty slot
-            head = head->next;
-        }
-        head->next = (vid_node*) malloc(sizeof(vid_node));
-        head->next->data = buf;
-        head->next->next = NULL;
+        //vid_node * head = video_queue;
+        //while(head->next != NULL) { //find next empty slot
+        //    head = head->next;
+        //}
+        //head->next = (vid_node*) malloc(sizeof(vid_node));
+        //head->next->data = buf;
+        //head->next->next = NULL;
+
+        vid_node * head = (vid_node*) malloc(sizeof(vid_node));
+        head->data = buf;
+        head->next = video_queue;
+        video_queue = head;
+
     }
 
 }

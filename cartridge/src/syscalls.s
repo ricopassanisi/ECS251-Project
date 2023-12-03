@@ -1,6 +1,6 @@
 .section .text, "ax"
-.global GetTicks, GetController, GetCmd, load_sprite_sys
-.global load_sprite_data_sys, load_palette_sys, display_sprite_sys 
+.global GetTicks, GetController, GetCmd, clear_cmd 
+.global load_sprite_sys, load_sprite_data_sys, load_palette_sys, display_sprite_sys 
 .global delete_sprite_sys, change_sprite_palette_sys, load_background_palette_sys, load_background_data_pixel_sys
 .global load_background_sys, delete_background_sys
 .global threadCreate, threadYield, threadExit
@@ -11,7 +11,7 @@
 GetTicks:
     li a5, 1
     ecall
-GetController:
+clear_cmd:
     li a5, 2
     ecall
 GetCmd:
@@ -69,3 +69,4 @@ malloc_sys:
 create_square_sys:
     li a5, 35
     ecall
+
