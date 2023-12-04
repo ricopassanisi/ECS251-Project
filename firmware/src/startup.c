@@ -80,7 +80,6 @@ void init(void){
 extern volatile int global;
 extern volatile uint32_t controller_status;
 extern volatile uint32_t cmd_interrupt;
-//extern volatile uint32_t *MEDIUM_PALETTE;
 
 void c_interrupt_handler(uint32_t cause){
     
@@ -114,23 +113,31 @@ uint32_t c_system_call(uint32_t arg0, uint32_t arg1, uint32_t arg2, uint32_t arg
             return cmd_interrupt;
         case 4:
             return load_sprite(*((sprite_t*)arg0));
+
         case 5:
             return load_sprite_data((SPRITE_TYPE)arg0, (uint8_t*)arg1, (uint8_t)arg2);
+
         case 6:
             return load_palette((SPRITE_TYPE) arg0, (uint32_t*) arg1, (uint8_t) arg2);
+
         case 7:
             return display_sprite((uint16_t) arg0, (uint16_t) arg1, (uint16_t) arg2, (uint8_t) arg3);
+
         case 8:
             return delete_sprite((uint16_t) arg0);
+
         case 9:
             return change_sprite_palette((uint16_t) arg0, (uint8_t) arg1);
+
         case 10: //load background palette
             return load_background_palette((uint32_t*)arg0, (uint8_t) arg1);
+
         case 11: //load background data pixel mode
             return load_background_data_pixel((uint8_t*)arg0, (uint8_t) arg1);
-        case 12: //uint32_t load_background_sys(uint32_t background_ptr);
-//uint32_t delete_background_sys(uint32_t background_id);
+
+        case 12: //Load background
             return load_background(*((background_t*)arg0));
+
         case 13:
             return delete_background((uint8_t)arg0);
 
@@ -156,32 +163,32 @@ uint32_t c_system_call(uint32_t arg0, uint32_t arg1, uint32_t arg2, uint32_t arg
     
         case 20:
             if(controller_status){
-            if(controller_status & 0x1){				//left
-                return a;
-            }
-            if(controller_status & 0x2){			//up
-                return w;
-            }
-            if(controller_status & 0x4){		// down
-                return x;
-            }
-            if(controller_status & 0x8){		//right
-                return d;
-            }
-            if(controller_status & 0x10){				//left
-                return u;
-            }
-            if(controller_status & 0x20){			//up
-                return i;
-            }
-            if(controller_status & 0x40){		// down
-                return j;
-            }
-            if(controller_status & 0x80){		//right
-                return k;
-            }
-            return 0;
-	}
+                if(controller_status & 0x1){ //left
+                    return a;
+                }
+                if(controller_status & 0x2){ //up
+                    return w;
+                }
+                if(controller_status & 0x4){ //down
+                    return x;
+                }
+                if(controller_status & 0x8){ //right
+                    return d;
+                }
+                if(controller_status & 0x10){ //left
+                    return u;
+                }
+                if(controller_status & 0x20){ //up
+                    return i;
+                }
+                if(controller_status & 0x40){ //down
+                    return j;
+                }
+                if(controller_status & 0x80){ //right
+                    return k;
+                }
+	        }
+            return NONE;
         case 30: //malloc sys?
             return malloc((size_t)arg0);
         case 35: //create_square
