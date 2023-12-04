@@ -5,6 +5,7 @@
 #include <threading/threads.h>
 #include <controller.h>
 #include <mem.h>
+#include <util.h>
 
 volatile uint32_t controller_status = 0;
 volatile uint32_t *MODE_REGISTER = (volatile uint32_t *)(0x500F6780);
@@ -12,10 +13,7 @@ volatile uint32_t *MODE_REGISTER = (volatile uint32_t *)(0x500F6780);
 // volatile char *VIDEO_MEMORY = (volatile char *)(0x50000000 + 0xF4800);
 
 
-// Syscall setup
-uint32_t GetTicks(void);
-uint32_t GetCmd(void);
-uint32_t clear_cmd(void);
+
 
 int main()
 {
@@ -27,7 +25,7 @@ int main()
     // Fill out sprite data
 
     // uint8_t * med_square_data = (uint8_t*) malloc(1024*sizeof(uint8_t));
-    uint8_t *med_square_data = (uint8_t *) mem_alloc(1024);
+    uint8_t *med_square_data = (uint8_t *) mem_alloc(1024*sizeof(uint8_t));
     // uint8_t med_square_data[1024];
     uint8_t small_square_data[256];
     uint8_t large_square_data[4096];
@@ -113,6 +111,7 @@ int main()
     load_palette(LARGE, sprite_palette, 0);
     load_background_palette(sprite_palette, 0);
 
+    
     sprite_t square;
     square.type = MEDIUM;
     square.data_index = 0;
@@ -140,6 +139,7 @@ int main()
         square_ids[i] = create_square(0xFF0000FF);
         display_sprite(square_ids[i], (34*i),70,1);
     }
+    
     int x_pos = 0;
     int last_x_pos = x_pos;
     display_sprite(small_id, 200, 50, 1);

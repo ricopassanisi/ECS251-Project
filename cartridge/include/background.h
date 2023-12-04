@@ -1,3 +1,8 @@
+/**
+ * @file background.h
+ * 
+ * background types and system calls
+*/
 #include <stdint.h>
 
 
@@ -32,7 +37,7 @@ int8_t load_background_palette(uint32_t* palette, uint8_t index) {
     return load_background_palette_sys((uint32_t) palette, (uint32_t) index);
 }
 
-/** @brief Loads background data buffer in pixel mode
+/** @brief Load background data pixel - loads the background data buffer in pixel mode
  * 
  * @param data the data buffer of pixel values to load in (assumes a full buffer)
  * 
@@ -44,33 +49,32 @@ int8_t load_background_data_pixel(uint8_t* data, uint8_t index) {
     return load_background_data_pixel_sys((uint32_t) data, (uint32_t) index);
 }
 
-/** @brief change sprite palette - changes the palette for the given sprite ID
+/** @note THIS IS AN UNIMPLEMENTED FUNCTION AND SHOULD NOT BE USED
+ *  
+ * @brief load background data tile - loads the background data in tile mode
  * 
- * @param sprite_id the sprite for which to change the palette
+ * @param data the data buffer of pixel values to load in (assumes a full buffer)
  * 
- * @param palette_index the new palette index for the sprite
+ * @param index the index to load the data into
  * 
  * @return 0 upon success, -1 upon failure.
 */
 int8_t load_background_data_tile(uint32_t* data, uint8_t index);
 
-/** @brief change sprite palette - changes the palette for the given sprite ID
+/** @brief load background - loads the background control structure from the background_t type
  * 
- * @param sprite_id the sprite for which to change the palette
+ * @param background the background data type to create the control structure from
  * 
- * @param palette_index the new palette index for the sprite
  * 
- * @return 0 upon success, -1 upon failure.
+ * @return returns the background ID upon success, -1 upon failure.
 */
 uint8_t load_background(background_t background) {
     return load_background_sys((uint32_t)&background);
 }
 
-/** @brief change sprite palette - changes the palette for the given sprite ID
+/** @brief delete background - deletes the background associated with the given ID
  * 
- * @param sprite_id the sprite for which to change the palette
- * 
- * @param palette_index the new palette index for the sprite
+ * @param background_id the background ID to delete.
  * 
  * @return 0 upon success, -1 upon failure.
 */

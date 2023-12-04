@@ -1,7 +1,13 @@
+/**
+ * @file controller.h
+ * 
+ * Button enum type and controller syscall
+*/
+
 #include <stdint.h>
 
 
-
+//Button enum type
 typedef enum Button {
     w,
     a,
@@ -17,7 +23,10 @@ typedef enum Button {
 uint32_t get_controller_sys();
 
 
-
+/** @brief get controller - Gets the current value of the controller
+ * 
+ * @return A Button type representing the button being pressed (or none)
+*/
 Button get_controller() {
     return (Button) get_controller_sys();
 }

@@ -6,7 +6,7 @@
 .global threadCreate, threadYield, threadExit
 .global get_controller_sys
 .global create_square_sys
-.global malloc_sys
+.global malloc_sys, free_sys
 
 GetTicks:
     li a5, 1
@@ -64,6 +64,9 @@ get_controller_sys:
 
 malloc_sys:
     li a5, 30
+    ecall
+free_sys:
+    li a5, 31
     ecall
 
 create_square_sys:

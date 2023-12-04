@@ -1,6 +1,9 @@
-/*
-* 
+/**
+ * @file sprite.h
+ * 
+ * Sprite types and system calls
 */
+
 #include <stdint.h>
 
 /*
@@ -39,7 +42,6 @@ uint32_t create_square_sys(uint32_t color);
 /** @brief Load Sprite - Loads the control structure and returns the sprite ID related to the sprite.
  * 
  * @param sprite sprite_t structure representing the information for the sprite
- * 
  * 
  * @return A 16 bit unsigned value representing the sprite ID, or -1 upon failure to load the sprite
 */
@@ -124,7 +126,6 @@ int change_sprite_palette(int16_t sprite_id, uint8_t palette_index) {
  * This allows for the creation of 30 medium sized squares using 10 unique colors.
  * 
  * @param color the color value for the square
- * 
  * 
  * @return the sprite ID of the newly created square, or -1 upon failure.
 */
