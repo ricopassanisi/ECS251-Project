@@ -9,7 +9,8 @@ threadCreate:
     ecall
 
 threadYield:
-    mv a0, sp   # Move stack pointer for yielding
+    mv a0, ra
+    jal _saveTCBtoStack
     li a5, 11
     ecall
 

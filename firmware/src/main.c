@@ -41,7 +41,22 @@ int main() {
         if(*CartridgeStatus & 0x1){
             FunctionPtr cartridge = (FunctionPtr)((*CartridgeStatus) & 0xFFFFFFFC);
 
-            cartridge();
+            threadCreate(cartridge, NULL);
+            for(int i = 0; i < 500000; i++) {
+                strcpy((char *)VIDEO_MEMORY,"CART INSERTED");
+              };
+
+            while(threadYield(0) == true) {
+              for(int i = 0; i < 500000; i++) {
+                strcpy((char *)VIDEO_MEMORY,"MAIN YIELDING");
+              };
+            }
+
+            for(int i = 0; i < 500000; i++) {
+                strcpy((char *)VIDEO_MEMORY,"YIELDING IS FALSE");
+              };
+
+
         }
 
         itoa(counter, Buffer, 10);

@@ -79,7 +79,7 @@ void c_interrupt_handler(uint32_t cause){
     csr_enable_interrupts();
 }
 
-uint32_t cartridgeGP;
+uint32_t cartridgeGP = 0;
 
 uint32_t c_system_call(uint32_t arg0, uint32_t arg1, uint32_t arg2, uint32_t arg3, uint32_t arg4, uint32_t call){
 

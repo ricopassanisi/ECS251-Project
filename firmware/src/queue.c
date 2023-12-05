@@ -6,7 +6,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
-
 #include <threading/threads.h>
 
 Queue* queueNew(int size) {

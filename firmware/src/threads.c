@@ -43,25 +43,44 @@ bool threadCreate(TThreadEntry entry, void* param) {
 
 bool threadYield(uint32_t threadSP) {
 
-    TCB* finishedThread, *chosenThread;
+    // TODO: Implement for when main thread is thread 0
+
+    // This should only return false for the main thread since
+    // that is never deleted until cleanup
     if(scheduler -> ready -> size <= 1) {
         return false;
     }
 
-    // Get finished thread
+    TCB* chosenThread, *finishedThread;
+
     queuePop(scheduler -> ready, (void*)&finishedThread);
-
-    // Peek new thread
     queuePeek(scheduler -> ready, (void*)&chosenThread);
-
-    // Put finished thread back into ready list at the end
     queuePush(scheduler -> ready, (void*)finishedThread);
 
-    // Context Switch
-    scheduler -> threadID = chosenThread -> threadID;
-    SwitchThread(&(finishedThread -> stacktop), chosenThread -> stacktop, threadSP, cartridgeGP);
+    if(finishedThread -> threadID != 0) {
+        finishedThread -> stacktop = (uint32_t*)threadSP;
+    }
 
-    return true;
+    // If current thread is main thread, use switch context instead
+    if(scheduler -> threadID == 0) {
+
+        scheduler -> threadID = chosenThread -> threadID;
+        SwitchThread(&(finishedThread -> stacktop), chosenThread -> stacktop, cartridgeGP);
+        
+        return true;
+
+    }
+    scheduler -> threadID = chosenThread -> threadID;
+
+    bool setCartGP = true;
+    if(chosenThread -> threadID == 0) {
+        setCartGP = false;
+
+    }
+
+    StartThread(chosenThread -> stacktop, cartridgeGP, setCartGP);
+
+    return true; // This only get's called for main
 }
 
 void threadWrapper(TThreadEntry entry, void* param) {
@@ -78,6 +97,27 @@ void threadExit(void) {
     // TODO: Disable interrupts
     TCB* chosenThread, *finishedThread;
 
+    // If the main cartridge is exiting
+    // Delete all other threads except for thread 0;
+    if(scheduler -> threadID == 1) {
+        while(scheduler -> ready -> size > 1) {
+            queuePop(scheduler -> ready, (void*)&chosenThread);
+            if(chosenThread -> threadID == 0) {
+                queuePush(scheduler -> ready, (void*)&chosenThread);
+            } else {
+                free(chosenThread -> stack);
+                free(chosenThread);
+            }
+        }
+
+        // Main thread should be the only thread in the queue by now
+        queuePeek(scheduler -> ready, (void*)&chosenThread);
+        csr_disable_interrupts();
+        StartThread(chosenThread -> stacktop, cartridgeGP, false);
+
+        return;
+    }
+
     queuePop(scheduler -> ready, (void*)&finishedThread);
     queuePeek(scheduler -> ready, (void*)&chosenThread);
 
@@ -85,7 +125,11 @@ void threadExit(void) {
     free(finishedThread);
 
     scheduler -> threadID = chosenThread -> threadID;
-    StartThread(chosenThread -> stacktop, cartridgeGP);
+    bool setCartGP = true;
+    if(scheduler -> threadID == 0) {
+        setCartGP = false;
+    }
+    StartThread(chosenThread -> stacktop, cartridgeGP, setCartGP);
 
     return;
 }

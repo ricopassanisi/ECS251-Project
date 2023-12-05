@@ -17,8 +17,8 @@ typedef uint32_t *TThreadContext;
  * Function Defined in interrupt.s
 */
 TThreadContext InitThread(uint32_t* stacktop, TThreadEntry threadWrapper, void *param, TThreadEntry entry);
-void SwitchThread(TThreadContext* oldStacktop, TThreadContext newStacktop, uint32_t threadSP, uint32_t cartgp);
-void StartThread(TThreadContext newStacktop, uint32_t cartgp);
+void SwitchThread(TThreadContext* oldStacktop, TThreadContext newStacktop,uint32_t cartgp);
+void StartThread(TThreadContext newStacktop, uint32_t cartgp, bool setCartGp);
 
 
 typedef struct TCB {

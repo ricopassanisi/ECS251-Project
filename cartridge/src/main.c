@@ -24,16 +24,14 @@ void hang_print(char* str);
 
 int main() {
 
-  // threadCreate(func1, NULL);
-  // threadCreate(func2, NULL);
+  threadCreate(func1, NULL);
+  threadCreate(func2, NULL);
 
-  while (1) {
-    hang_print("CARTRIDGE YIELDING");
-    threadYield();
+  hang_print("CARTRIDGE YIELDING");
+  threadYield();
 
-    hang_print("CARTRIDGE DONE YIELDING");
-  }
 
+  hang_print("CARTRIDGE IS DONE");
 
   /* KEEP THIS HERE */
   threadExit(); // Calling thread exit in the in the main thread will 'eject' cartridge
@@ -43,10 +41,6 @@ int main() {
 void func1(void* param) {
   hang_print("FUNC ONE STARTED");
 
-  while(1) {
-    hang_print("Func ONE IN WHILE LOOP");
-    threadYield();
-  }
 
   hang_print("FUNC ONE ENDING");
   return;
@@ -54,8 +48,6 @@ void func1(void* param) {
 
 void func2(void* param) {
   hang_print("FUNC TWO STARTED");
-
-  threadYield();
 
 
   hang_print("FUNC TWO ENDING");

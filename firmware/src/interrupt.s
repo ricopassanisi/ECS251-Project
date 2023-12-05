@@ -71,18 +71,13 @@ InitThread:
     ret
     
 SwitchThread:
-    # move arg0 stack pointer to here
-    # c_system_call overwrites some things
-    # Setting stack pointer to exactly what it was when syscall invoked
-    mv      sp, a2
+    # This should only be called if main thread is the finished thread
+    csrci   mstatus, 0x8
 
     addi	sp,sp,-52
     
-    #sw	    ra,48(sp)
-    # Storing mepc as ra
-    csrr    a2, mepc
-    sw      a2, 48(sp)
-    
+    sw	    ra,48(sp)
+
     sw	    tp,44(sp)
     sw	    t0,40(sp)
     sw	    t1,36(sp)
@@ -99,7 +94,7 @@ SwitchThread:
     sw      sp,0(a0)
     mv      sp,a1
 
-    mv      gp, a3      # Set global pointer back to cartridge
+    mv      gp, a2      # Set global pointer back to cartridge
 
     lw	    ra,48(sp)
     lw	    tp,44(sp)
@@ -122,9 +117,13 @@ SwitchThread:
 StartThread:            # Starts a thread without switching context
                         # Ex, if a thread has completed execution
     mv      sp,a0
+     
+    # Check if moving to main thread, if so, set gp
+    beq     a3, zero, _StRest # if false, branch
+
 
     mv      gp, a1      # Set global pointer back to cartridge
-
+_StRest:
     lw	    ra,48(sp)
     lw	    tp,44(sp)
     lw	    t0,40(sp)

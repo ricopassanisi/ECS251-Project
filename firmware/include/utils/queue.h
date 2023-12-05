@@ -2,10 +2,10 @@
  * @file bounded-buffer.h
 */
 
+#pragma once
+
 #include <stdint.h>
 #include <stdbool.h>
-
-#pragma once
 
 typedef struct Queue {
     uint32_t MAX_SIZE;
