@@ -79,7 +79,8 @@ SECTIONS
         . = ALIGN(. != 0 ? 32 / 8 : 1);
         _ebss = .;          /* end of .bss segment */
     } > RAM
-
+    _heap_base =MAX(MAX(_erodata, MAX(_edata,_esdata)),_ebss);
+    _stack = __stack_top - 4096;
     __global_pointer$ = MIN(_sdata + 0x800,
 		            MAX(_data + 0x800, _ebss - 0x800));
 

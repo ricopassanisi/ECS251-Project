@@ -61,4 +61,6 @@ void clear_video_queue() {
         free(head->data.words);
         head = video_queue;
     }
+
+    video_queue = NULL;
 }

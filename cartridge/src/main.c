@@ -4,20 +4,58 @@
 #include <background.h>
 #include <threading/threads.h>
 #include <controller.h>
-#include <mem.h>
 #include <util.h>
 
-volatile uint32_t controller_status = 0;
-volatile uint32_t *MODE_REGISTER = (volatile uint32_t *)(0x500F6780);
-// Video memory and medium sprite stuff:
-// volatile char *VIDEO_MEMORY = (volatile char *)(0x50000000 + 0xF4800);
+//fill data of buffer with spaceship data
+void load_spaceship_data(uint8_t *med_buffer) {
+    /* spaceship_palette[0] = 0x00000000; //transparent black
+    spaceship_palette[1] = 0xFF303030; //Dark Grey
+    spaceship_palette[2] = 0xFF545454; //Med grey
+    spaceship_palette[3] = 0xFF787878; //light grey
+    spaceship_palette[4] = 0xFFFF0000; //red
+    spaceship_palette[5] = 0xFFFF8400; //orange
+    spaceship_palette[6] = 0xFFFFFF00; //yellow
+    spaceship_palette[7] = 0xFF00BBFF; //light blue */
+    int y_off_permanent = 2*32; //kinda screwed up the pixel drawing so need this
+    med_buffer[y_off_permanent + (1*32) + 9] = 6;
+    med_buffer[y_off_permanent + (1*32) + 10] = 5;
+    med_buffer[y_off_permanent + (1*32) + 11] = 4;
+    med_buffer[y_off_permanent + (1*32) + 12] = 1;
+    med_buffer[y_off_permanent + (1*32) + 13] = 1;
+    med_buffer[y_off_permanent + (1*32) + 14] = 1;
+    med_buffer[y_off_permanent + (1*32) + 15] = 1;
+
+    med_buffer[y_off_permanent + (2*32) + 10] = 6;
+    med_buffer[y_off_permanent + (2*32) + 11] = 4;
+    med_buffer[y_off_permanent + (2*32) + 12] = 2;
+    med_buffer[y_off_permanent + (2*32) + 13] = 1;
+    med_buffer[y_off_permanent + (2*32) + 14] =1;
+
+    med_buffer[y_off_permanent + (3*32) + 12] = 2;
+    med_buffer[y_off_permanent + (3*32) + 12] = 1;
+
+    med_buffer[y_off_permanent + (4*32) + 12] = 2;
+    med_buffer[y_off_permanent + (5*32) + 12] = 2;
+
+    for(int y = 6; y <= 9; ++y) {
+        med_buffer[y_off_permanent + (y*32) + 12] = 3;
+        med_buffer[y_off_permanent + (y*32) + 13] = 2;
+    }
+
+    
+    med_buffer[y_off_permanent + (10*32) + 8] = 2;
+    med_buffer[y_off_permanent + (10*32) + 9] = 2;
+    med_buffer[y_off_permanent + (10*32) + 12] = 2; 
+    med_buffer[y_off_permanent + (10*32) + 13] = 3; 
+    med_buffer[y_off_permanent + (10*32) + 14] = 2; 
 
 
+
+}
 
 
 int main()
 {
-    *MODE_REGISTER = 1; //Move into graphics mode
     int global = GetTicks();
     int last_global = global;
     int glob_init = global;
@@ -25,7 +63,7 @@ int main()
     // Fill out sprite data
 
     // uint8_t * med_square_data = (uint8_t*) malloc(1024*sizeof(uint8_t));
-    uint8_t *med_square_data = (uint8_t *) mem_alloc(1024*sizeof(uint8_t));
+    uint8_t *med_square_data = (uint8_t *) malloc(1024*sizeof(uint8_t));
     // uint8_t med_square_data[1024];
     uint8_t small_square_data[256];
     uint8_t large_square_data[4096];
@@ -61,12 +99,36 @@ int main()
     }
 
     // create background in pixel mode:
-    uint8_t background_data[512 * 288];
-    for (int y = 0; y < 288; ++y)
+    //uint8_t background_data[512 * 288];
+    uint8_t *background_data = (uint8_t*) malloc(512*288*sizeof(uint8_t));
+    for (int y = 0; y < 18; ++y)
     {
-        for (int x = 0; x < 512; ++x)
+        for (int x = 0; x < 32; ++x)
         {
-            background_data[y * 512 + x] = 2;
+            int offset = (((y*512)*16)+((x*16)));
+            if(!(x % 2)) {
+                //background_data[offset + (2*512) + 1] = 4;
+                
+            } else {
+                
+            }
+
+            if(!(y % 2)) {
+                
+            }
+            else {
+                //background_data[offset + (3*512) + 6] = 4;
+                
+            }
+            background_data[offset + (6*512) + 13] = 4;
+            background_data[offset + (3*512) + 9] = 4;
+                //background_data[offset + (9*512) + 3] = 4;
+            background_data[offset + (2*512) + 2] = 4;
+                //background_data[offset + (10*512) + 8] = 4;
+            background_data[offset + (12*512) + 4] = 4;
+            
+            
+            //background_data[y * 512 + x] = 2;
         }
     }
 
@@ -100,27 +162,45 @@ int main()
         }
     }
 
-    uint32_t *sprite_palette = (uint32_t *)malloc_sys(256 * sizeof(uint32_t));
+    uint32_t *sprite_palette = (uint32_t *)malloc(256 * sizeof(uint32_t));
     sprite_palette[1] = 0xFFFF06B5; // A R G B
     sprite_palette[2] = 0xFF00FF00; // Green
     sprite_palette[3] = 0xFF0000FF; // Blue
-
+    sprite_palette[4] = 0xFFFFFFFF; //white
 
     load_palette(MEDIUM, sprite_palette, 0);
     load_palette(SMALL, sprite_palette, 0);
     load_palette(LARGE, sprite_palette, 0);
     load_background_palette(sprite_palette, 0);
 
-    
+    uint32_t *spaceship_palette = (uint32_t *) malloc(256*sizeof(uint32_t));
+    spaceship_palette[0] = 0x00000000; //transparent black
+    spaceship_palette[1] = 0xFF303030; //Dark Grey
+    spaceship_palette[2] = 0xFF545454; //Med grey
+    spaceship_palette[3] = 0xFF787878; //light grey
+    spaceship_palette[4] = 0xFFFF0000; //red
+    spaceship_palette[5] = 0xFFFF8400; //orange
+    spaceship_palette[6] = 0xFFFFFF00; //yellow
+    spaceship_palette[7] = 0xFF00BBFF; //light blue
+
+    load_palette(MEDIUM, spaceship_palette, 1);
+
+    uint8_t *spaceship_data = (uint8_t*) malloc(32*32*sizeof(uint8_t));
+    load_spaceship_data(spaceship_data);
+
+    load_sprite_data(MEDIUM, spaceship_data, 1);
+
     sprite_t square;
     square.type = MEDIUM;
-    square.data_index = 0;
-    square.palette = 0;
+    square.data_index = 1;
+    square.palette = 1;
     square.x = 0;
     square.y = 0;
     square.z = 0;
     uint16_t id = load_sprite(square);
     square.type = SMALL;
+    square.data_index = 0;
+    square.palette = 0;
     uint16_t small_id = load_sprite(square);
     square.type = LARGE;
     uint16_t large_id = load_sprite(square);
@@ -143,6 +223,8 @@ int main()
     int x_pos = 0;
     int last_x_pos = x_pos;
     display_sprite(small_id, 200, 50, 1);
+    free(spaceship_palette);
+    free(background_data);
     while (1) {
         threadYield();
         // int c = a + b + global;
@@ -171,6 +253,9 @@ int main()
                 if ((x_pos & 0x3F) != 0x3F){
                     x_pos++;
                 }
+                break;
+            case i:
+                free(med_square_data);
                 break;
             default:
                 break;
