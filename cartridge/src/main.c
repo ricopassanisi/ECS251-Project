@@ -29,7 +29,7 @@ void load_spaceship_data(uint8_t *med_buffer) {
     med_buffer[y_off_permanent + (2*32) + 11] = 4;
     med_buffer[y_off_permanent + (2*32) + 12] = 2;
     med_buffer[y_off_permanent + (2*32) + 13] = 1;
-    med_buffer[y_off_permanent + (2*32) + 14] =1;
+    med_buffer[y_off_permanent + (2*32) + 14] = 1;
 
     med_buffer[y_off_permanent + (3*32) + 12] = 2;
     med_buffer[y_off_permanent + (3*32) + 12] = 1;
@@ -40,6 +40,9 @@ void load_spaceship_data(uint8_t *med_buffer) {
     for(int y = 6; y <= 9; ++y) {
         med_buffer[y_off_permanent + (y*32) + 12] = 3;
         med_buffer[y_off_permanent + (y*32) + 13] = 2;
+
+        med_buffer[y_off_permanent + ((y+11)*32) + 12] = 3;
+        med_buffer[y_off_permanent + ((y+11)*32) + 13] = 2;
     }
 
     
@@ -49,8 +52,84 @@ void load_spaceship_data(uint8_t *med_buffer) {
     med_buffer[y_off_permanent + (10*32) + 13] = 3; 
     med_buffer[y_off_permanent + (10*32) + 14] = 2; 
 
+    med_buffer[y_off_permanent + (11*32) + 7] = 3;
+    med_buffer[y_off_permanent + (11*32) + 8] = 3;
+    med_buffer[y_off_permanent + (11*32) + 9] = 2;
+    med_buffer[y_off_permanent + (11*32) + 10] = 2;
+    med_buffer[y_off_permanent + (11*32) + 11] = 1;
+    med_buffer[y_off_permanent + (11*32) + 12] = 2;
+    med_buffer[y_off_permanent + (11*32) + 13] = 2;
+    med_buffer[y_off_permanent + (11*32) + 14] = 3;
+    med_buffer[y_off_permanent + (11*32) + 15] = 3;
+    med_buffer[y_off_permanent + (11*32) + 16] = 3;
+    med_buffer[y_off_permanent + (11*32) + 17] = 3;
 
+    med_buffer[y_off_permanent + (13*32) + 4] = 6;
+    med_buffer[y_off_permanent + (13*32) + 25] = 3;
+    med_buffer[y_off_permanent + (13*32) + 26] = 3;
+    int topbotval = 6;
+    int midval = 5;
+    for(int x = 5; x < 25; ++x) {
+        if(x == 6) {
+            topbotval = 5;
+            midval = 4;
+        } else if(x == 7) {
+            topbotval = topbotval = 4;
+            midval = 3;
+        }else if(x == 10) {
+            topbotval = 2;
+        } else if(x == 12) {
+            topbotval = 1;
+            midval = 2;
+        } else if(x == 15) {
+            midval = 7;
+        } else if(x == 17) {
+            topbotval = 3;
+        } else if(x == 24) {
+            midval = 3;
+        }
+        med_buffer[y_off_permanent + (12*32) + x] = topbotval;
+        med_buffer[y_off_permanent + (13*32) + x] = midval;
+        med_buffer[y_off_permanent + (14*32) + x] = topbotval;
+    }
 
+    med_buffer[y_off_permanent + (15*32) + 7] = 3;
+    med_buffer[y_off_permanent + (15*32) + 8] = 3;
+    med_buffer[y_off_permanent + (15*32) + 9] = 2;
+    med_buffer[y_off_permanent + (15*32) + 10] = 2;
+    med_buffer[y_off_permanent + (15*32) + 11] = 1;
+    med_buffer[y_off_permanent + (15*32) + 12] = 2;
+    med_buffer[y_off_permanent + (15*32) + 13] = 2;
+    med_buffer[y_off_permanent + (15*32) + 14] = 3;
+    med_buffer[y_off_permanent + (15*32) + 15] = 3;
+    med_buffer[y_off_permanent + (15*32) + 16] = 3;
+    med_buffer[y_off_permanent + (15*32) + 17] = 3;
+
+    med_buffer[y_off_permanent + (16*32) + 8] = 2;
+    med_buffer[y_off_permanent + (16*32) + 9] = 2;
+    med_buffer[y_off_permanent + (16*32) + 12] = 2; 
+    med_buffer[y_off_permanent + (16*32) + 13] = 3; 
+    med_buffer[y_off_permanent + (16*32) + 14] = 2; 
+
+    med_buffer[y_off_permanent + (21*32) + 12] = 2;
+    med_buffer[y_off_permanent + (22*32) + 12] = 2;
+
+    med_buffer[y_off_permanent + (23*32) + 12] = 2;
+    med_buffer[y_off_permanent + (23*32) + 12] = 1;
+
+    med_buffer[y_off_permanent + (24*32) + 10] = 6;
+    med_buffer[y_off_permanent + (24*32) + 11] = 4;
+    med_buffer[y_off_permanent + (24*32) + 12] = 2;
+    med_buffer[y_off_permanent + (24*32) + 13] = 1;
+    med_buffer[y_off_permanent + (24*32) + 14] = 1;
+
+    med_buffer[y_off_permanent + (25*32) + 9] = 6;
+    med_buffer[y_off_permanent + (25*32) + 10] = 5;
+    med_buffer[y_off_permanent + (25*32) + 11] = 4;
+    med_buffer[y_off_permanent + (25*32) + 12] = 1;
+    med_buffer[y_off_permanent + (25*32) + 13] = 1;
+    med_buffer[y_off_permanent + (25*32) + 14] = 1;
+    med_buffer[y_off_permanent + (25*32) + 15] = 1;
 }
 
 
