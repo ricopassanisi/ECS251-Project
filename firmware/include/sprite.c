@@ -232,6 +232,7 @@ uint16_t load_sprite(sprite_t sprite) {
         case SMALL:
             for(int i = 0; i < 256; ++i) {
                 if(!SMALL_CONTROL[i]) { //unfilled section
+                    SMALL_CONTROL[i] = 1;
                     val[0] = SmallControl(sprite.palette, sprite.x, sprite.y, sprite.z, sprite.data_index);
                     buffer.words = val;
                     buffer.video_mem32 = SMALL_CONTROL + i;
@@ -244,6 +245,7 @@ uint16_t load_sprite(sprite_t sprite) {
         case MEDIUM:
             for(int i = 0; i < 256; ++i) {
                 if(!MEDIUM_CONTROL[i]) { //unfilled
+                    MEDIUM_CONTROL[i] = 1;
                     val[0] = MediumControl(sprite.palette, sprite.x, sprite.y, sprite.z, sprite.data_index);
                     buffer.words = val;
                     buffer.video_mem32 = MEDIUM_CONTROL + i;
@@ -256,6 +258,7 @@ uint16_t load_sprite(sprite_t sprite) {
         case LARGE:
             for(int i = 0; i < 256; ++i) {
                 if(!LARGE_CONTROL[i]) { //unfilled
+                    LARGE_CONTROL[i] = 1;
                     val[0] = LargeControl(sprite.palette, sprite.x, sprite.y, sprite.z, sprite.data_index);
                     buffer.words = val;
                     buffer.video_mem32 = LARGE_CONTROL + i;

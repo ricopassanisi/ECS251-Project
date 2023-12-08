@@ -4,8 +4,7 @@
  * Declares all objects and functions regarding thread creation and destruction
 */
 
-#ifndef THREADS_H
-#define THREADS_H
+#pragma once
 
 #include <stdint.h>
 #include <stddef.h>
@@ -18,8 +17,8 @@ typedef uint32_t *TThreadContext;
  * Function Defined in interrupt.s
 */
 TThreadContext InitThread(uint32_t* stacktop, TThreadEntry threadWrapper, void *param, TThreadEntry entry);
-void SwitchThread(TThreadContext* oldStacktop, TThreadContext newStacktop);
-void StartThread(TThreadContext newStacktop);
+void SwitchThread(TThreadContext* oldStacktop, TThreadContext newStacktop,uint32_t cartgp);
+void StartThread(TThreadContext newStacktop, uint32_t cartgp, bool setCartGp);
 
 
 typedef struct TCB {
@@ -29,6 +28,8 @@ typedef struct TCB {
     uint32_t* stacktop;
     uint32_t* stack;
 }TCB;
+
+extern uint32_t threadCounter;
 
 /** @brief Creates a new thread and adds it to the ready list
  * 
@@ -40,12 +41,14 @@ typedef struct TCB {
 */
 bool threadCreate(TThreadEntry entry, void* param);
 
-/** @brief Yields thread and does a context switch with next ready threade
+/** @brief Yields thread and does a context switch with next ready thread
+ * 
+ * @param threadSP Stack Pointer for thread that is yielding
  * 
  * @returns true if yield successful, false if there are no other threads on ready
  * list
 */
-bool threadYield(void);
+bool threadYield(uint32_t threadSP);
 
 /** @brief stub for threads
  * 
@@ -62,5 +65,3 @@ void threadWrapper(TThreadEntry entry, void* param);
  * @returns void
 */
 void threadExit(void);
-
-#endif 

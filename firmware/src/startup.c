@@ -102,8 +102,13 @@ void c_interrupt_handler(uint32_t cause){
     }
 }
 
+uint32_t cartridgeGP = 0;
+
 uint32_t c_system_call(uint32_t arg0, uint32_t arg1, uint32_t arg2, uint32_t arg3, uint32_t arg4, uint32_t call){
     switch(call) {
+        case 0:
+            cartridgeGP = arg0;
+            return 0x0;
         case 1:
             return global;
         case 2: //clear cmd_interrupt
@@ -146,20 +151,11 @@ uint32_t c_system_call(uint32_t arg0, uint32_t arg1, uint32_t arg2, uint32_t arg
             return threadCreate((TThreadEntry) arg0, (void*)arg1);
 
         case 15:
-            return threadYield();
+            return threadYield(arg0);
 
         case 16:
             threadExit();
             return 0;
-
-        case 17:
-            return lockAcquire((Lock*)arg0);
-
-        case 18:
-            return lockRelease((Lock*)arg0);
-
-        case 19:
-            return (uint32_t)lockCreate();
     
         case 20:
             if(controller_status){
@@ -189,11 +185,6 @@ uint32_t c_system_call(uint32_t arg0, uint32_t arg1, uint32_t arg2, uint32_t arg
                 }
 	        }
             return NONE;
-        case 30: //malloc sys?
-            return malloc((size_t)arg0);
-        case 31: //free sys
-            free((void*) arg0);
-            return 0;
         case 35: //create_square
             return create_square(arg0);
         default:

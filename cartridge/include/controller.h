@@ -4,12 +4,13 @@
  * Button enum type and controller syscall
 */
 
+#pragma once
 #include <stdint.h>
 
 
 //Button enum type
 typedef enum Button {
-    w,
+    w = 0,
     a,
     x,
     d,

@@ -9,8 +9,13 @@ _start:
     .option pop
     la sp, __stack_top
     add s0, sp, zero
-    jal ra, init
-    nop
-    jal zero, main
+
+    call    init
+    la      ra, main
+    mv      a0, gp
+    li      a5, 0
+    ecall
+
+
     .cfi_endproc
     .end

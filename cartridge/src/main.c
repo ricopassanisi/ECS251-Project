@@ -6,6 +6,8 @@
 #include <controller.h>
 #include <util.h>
 
+void display_game_over(void);
+
 //fill data of buffer with spaceship data
 void load_spaceship_data(uint8_t *med_buffer) {
     /* spaceship_palette[0] = 0x00000000; //transparent black
@@ -334,7 +336,7 @@ int main()
                 }
                 break;
             case i:
-                free(med_square_data);
+                display_game_over();
                 break;
             default:
                 break;
@@ -361,3 +363,89 @@ int main()
     return 0;
 }
 
+
+
+void display_game_over(void) {
+    //create completely black background:
+    background_t end_back;
+    end_back.type = PIXEL;
+    end_back.x = 0;
+    end_back.y = 0;
+    end_back.z = 3;
+    end_back.data_index = 0;
+    end_back.palette = 0;
+    uint32_t* back_palette = (uint32_t*) malloc(256*sizeof(uint32_t));
+    back_palette[0] = 0xFF000000;
+    back_palette[1] = 0xFFFF0000;
+
+    uint8_t* back_buf = (uint8_t*) malloc(288*512*sizeof(uint8_t));
+    uint8_t* sprite_data = (uint8_t*) malloc(16*16*sizeof(uint8_t));
+    for(int i = 0; i < 288*512; ++i) {
+        back_buf[i] = 0;
+    }
+    for(int i = 0; i < 16*16; ++i) {
+        sprite_data[i] = 1;
+    }
+    load_background_palette(back_palette,0);
+    load_palette(SMALL, back_palette, 3);
+    load_background_data_pixel(back_buf, 0);
+    load_sprite_data(SMALL, sprite_data, 125);
+    load_background(end_back);
+
+    uint16_t temp_id;
+    sprite_t draw_sprite;
+    draw_sprite.type = SMALL;
+    draw_sprite.data_index = 125;
+    draw_sprite.palette = 3;
+    draw_sprite.z = 3;
+
+    draw_sprite.x = 123;
+    draw_sprite.y = 46;
+    temp_id = load_sprite(draw_sprite);
+    display_sprite(temp_id, draw_sprite.x, draw_sprite.y, 3);
+
+    draw_sprite.x = 76;
+    draw_sprite.y = 40;
+    temp_id = load_sprite(draw_sprite);
+    display_sprite(temp_id, draw_sprite.x, draw_sprite.y, 3);
+
+    draw_sprite.x = 92;
+    draw_sprite.y = 40;
+    temp_id = load_sprite(draw_sprite);
+    //display_sprite(temp_id, draw_sprite.x, draw_sprite.y, 3);
+
+    draw_sprite.x = 108;
+    draw_sprite.y = 40;
+    temp_id = load_sprite(draw_sprite);
+    //display_sprite(temp_id, draw_sprite.x, draw_sprite.y, 3);
+
+    draw_sprite.x = 60;
+    draw_sprite.y = 64;
+    temp_id = load_sprite(draw_sprite);
+    //display_sprite(temp_id, draw_sprite.x, draw_sprite.y, 3);
+
+    draw_sprite.y = 80;
+    load_sprite(draw_sprite);
+
+    draw_sprite.x = 76;
+    draw_sprite.y = 96;
+    load_sprite(draw_sprite);
+
+    draw_sprite.x = 93;
+    draw_sprite.y = 96;
+    load_sprite(draw_sprite);
+
+    draw_sprite.x = 109;
+    draw_sprite.y = 96;
+    load_sprite(draw_sprite);
+
+    draw_sprite.y = 93;
+    load_sprite(draw_sprite);
+
+    for(int i = 0; i < 10000000; ++i) {
+        //wait for a bit to display
+    }
+
+    free(back_buf);
+    free(back_palette);
+}

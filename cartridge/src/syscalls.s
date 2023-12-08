@@ -52,6 +52,8 @@ threadCreate:
     li a5, 14
     ecall
 threadYield:
+    mv a0, ra
+    jal _saveTCBtoStack
     li a5, 15
     ecall
 threadExit:

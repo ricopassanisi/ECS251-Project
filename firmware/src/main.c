@@ -4,6 +4,7 @@
 #include <core/scheduler.h>
 #include <threading/threads.h>
 #include <mem.c>
+#include <utils/utils.h>
 
 volatile int global = 42;
 volatile uint32_t controller_status = 0;
@@ -33,11 +34,13 @@ int main() {
             FunctionPtr cartridge = (FunctionPtr)((*CartridgeStatus) & 0xFFFFFFFC);
             threadCreate(cartridge, NULL);
 
-            while(threadYield() == true) {
+            while(threadYield(0) == true) {
               ; // Spin while the cartridge thread still exists
             };
 
             // Once here, the cartridge has exited
+            // Need to set GP back
+            _setGP();
             break;
         }
     }

@@ -36,7 +36,8 @@ TARGET_OBJS =   $(OBJ_DIR)/main.o               \
                 $(OBJ_DIR)/crt0.o               \
                 $(OBJ_DIR)/syscalls.o          \
                 $(OBJ_DIR)/startup.o			\
-				$(OBJ_DIR)/mem.o
+				$(OBJ_DIR)/mem.o				\
+				$(OBJ_DIR)/threading.o
 
 all: directories $(BIN_DIR)/$(TARGET_NAME)
 
