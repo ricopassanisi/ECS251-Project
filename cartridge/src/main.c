@@ -393,7 +393,7 @@ int main()
 
                 if(small_obstacle_ids[i]) {
                     small_sprites[i].x += small_speed;
-                    if(small_sprites[i].x <= 5) {
+                    if(small_sprites[i].x <= -16) {
                         delete_sprite(small_obstacle_ids[i]);
                         num_deleted_obstacles++;
                         small_sprites[i].x = 512;
@@ -415,7 +415,7 @@ int main()
 
                 if(medium_obstacle_ids[i]) {
                     medium_sprites[i].x += medium_speed;
-                    if(medium_sprites[i].x <= 10) {
+                    if(medium_sprites[i].x <= -32) {
                         delete_sprite(medium_obstacle_ids[i]);
                         num_deleted_obstacles++;
                         medium_sprites[i].x = 512;
@@ -436,7 +436,7 @@ int main()
 
                 if(large_obstacle_ids[i]) {
                     large_sprites[i].x += large_speed;
-                    if(large_sprites[i].x <= 20) {
+                    if(large_sprites[i].x <= -64) {
                         delete_sprite(large_obstacle_ids[i]);
                         num_deleted_obstacles++;
                         large_sprites[i].x = 512;
@@ -520,7 +520,38 @@ int main()
             }
 
             //check collisions
-            
+            for(int i = 0; i < 8; ++i) {    
+                if(small_obstacle_ids[i]) { //Id exists
+                    if((small_sprites[i].x >= spaceship_x && small_sprites[i].x < spaceship_x + 32) 
+                        || (small_sprites[i].x + 16 >= spaceship_x && small_sprites[i].x + 16 < spaceship_x + 32)) { //correct X coordinate
+                        if((small_sprites[i].y >= spaceship_y && small_sprites[i].y < spaceship_y + 32) 
+                            || (small_sprites[i].y + 16 >= spaceship_y && small_sprites[i].y + 16 < spaceship_y + 32)) { //correct Y coordinate
+                                display_game_over();
+                        } 
+                    }
+                }
+                
+                if(medium_obstacle_ids[i]) {
+                    if((medium_sprites[i].x >= spaceship_x && medium_sprites[i].x < spaceship_x + 32) 
+                    || (medium_sprites[i].x + 32 >= spaceship_x && medium_sprites[i].x + 32 < spaceship_x + 32)) { //correct X
+                        if((medium_sprites[i].y >= spaceship_y && medium_sprites[i].y < spaceship_y + 32) 
+                        || (medium_sprites[i].y + 32 >= spaceship_y && medium_sprites[i].y + 32 < spaceship_y + 32)) { //correct Y
+                            display_game_over();
+                        }
+                    }
+                }
+
+                if(large_obstacle_ids[i]) {
+                    if((large_sprites[i].x >= spaceship_x && large_sprites[i].x < spaceship_x + 32) 
+                    || (large_sprites[i].x + 64 >= spaceship_x && large_sprites[i].x + 64 < spaceship_x + 32)) {
+                        if((large_sprites[i].y >= spaceship_y && large_sprites[i].y < spaceship_y + 32) 
+                        || (large_sprites[i].y + 64 >= spaceship_y && large_sprites[i].y + 64 < spaceship_y + 32)) {
+                            display_game_over();
+                        }
+                    }
+                }
+
+            }
 
         }
     }
@@ -612,4 +643,5 @@ void display_game_over(void) {
 
     free(back_buf);
     free(back_palette);
+
 }
