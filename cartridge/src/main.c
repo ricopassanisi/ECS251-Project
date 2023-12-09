@@ -181,27 +181,6 @@ int main()
     load_sprite_data(MEDIUM, med_square_data, 0);
     //load_sprite_data(SMALL, small_square_data, 0);
     //load_sprite_data(LARGE, large_square_data, 0);
-    // Create green triangle
-    for (int y = 0; y < 32; ++y)
-    {
-        for (int x = 0; x < y + 1; ++x)
-        {
-            // MEDIUM_DATA[(1024)+(y*32+x)] = 2;
-        }
-    }
-    // Create blue triangle
-    for (int y = 0; y < 32; ++y)
-    {
-        for (int x = 31; x >= y; --x)
-        {
-            // MEDIUM_DATA[(1024*2)+(y*32+x)] = 3;
-        }
-    }
-
-
-    
-
-    //fill obstacle datas
 
     uint32_t *sprite_palette = (uint32_t *)malloc(256 * sizeof(uint32_t));
     sprite_palette[1] = 0xFFFF06B5; // A R G B
@@ -228,6 +207,36 @@ int main()
         //large range
         if(i < 64*64) large_obstacle_data[i] = 5;
 
+    }
+
+    for(int i = 0; i < 4; ++i) {
+        for(int j = 0; j < 4-i; ++j) {
+            small_obstacle_data[(i*16) + j] = 0;
+            small_obstacle_data[(i*16) + (15-j)] = 0;
+
+            small_obstacle_data[((15-i)*16) + j] = 0;
+            small_obstacle_data[((15-i)*16) + (15-j)] = 0;
+        }
+    }
+
+    for(int i = 0; i < 8; ++i) {
+        for(int j = 0; j < 8-i; ++j) {
+            medium_obstacle_data[(i*32) + j] = 0;
+            medium_obstacle_data[(i*32) + (31-j)] = 0;
+
+            medium_obstacle_data[((31-i)*32) + j] = 0;
+            medium_obstacle_data[((31-i)*32) + (31-j)] = 0;
+        }
+    }
+
+    for(int i = 0; i < 16; ++i) {
+        for(int j = 0; j < 16-i; ++j) {
+            large_obstacle_data[(i*64) + j] = 0;
+            large_obstacle_data[(i*64) + (63-j)] = 0;
+
+            large_obstacle_data[((63-i)*64) + j] = 0;
+            large_obstacle_data[((63-i)*64) + (63-j)] = 0;
+        }
     }
 
     load_sprite_data(SMALL, small_obstacle_data, 5);
@@ -340,6 +349,7 @@ int main()
     int x_pos = 0;
     uint16_t spaceship_x = 20;
     uint16_t spaceship_y = 128;
+    display_sprite(spaceship_id, spaceship_x, spaceship_y, 1);
     int last_y_pos = spaceship_y;
     //display_sprite(small_id, 200, 50, 1);
     free(spaceship_palette);
@@ -420,9 +430,7 @@ int main()
                         num_deleted_obstacles++;
                         medium_sprites[i].x = 512;
                         medium_obstacle_ids[i] = 0;
-
                         uint8_t idx = (global + num_deleted_obstacles + i) % 8;
-                        //while(medium_obstacle_ids[idx]) idx = (global + num_deleted_obstacles + i+1) % 8; //TOODO may cause inf loop
                         uint8_t temp = 1;
                         while(medium_obstacle_ids[idx]) {
                             idx = (global + num_deleted_obstacles + i+temp) % 8;
@@ -444,7 +452,7 @@ int main()
                         uint8_t temp = 1;
                         uint8_t idx = (global + num_deleted_obstacles + i) % 8;
                         while(large_obstacle_ids[idx]) {
-                            idx = (global + num_deleted_obstacles + i+temp) % 8; //TOODO may cause inf loop
+                            idx = (global + num_deleted_obstacles + i+temp) % 8; 
                             temp++;
                         }
                         large_obstacle_ids[idx] = load_sprite(large_sprites[idx]);
@@ -550,9 +558,7 @@ int main()
                         }
                     }
                 }
-
             }
-
         }
     }
     return 0;
