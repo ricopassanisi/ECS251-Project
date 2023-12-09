@@ -600,48 +600,95 @@ void display_game_over(void) {
     draw_sprite.palette = 3;
     draw_sprite.z = 3;
 
-    draw_sprite.x = 123;
-    draw_sprite.y = 46;
+    int x_offset = 118;
+
+    draw_sprite.x = 148;
+    draw_sprite.y = 66;
     temp_id = load_sprite(draw_sprite);
-    display_sprite(temp_id, draw_sprite.x, draw_sprite.y, 3);
-
-    draw_sprite.x = 76;
-    draw_sprite.y = 40;
+    
+    draw_sprite.x = 164;
     temp_id = load_sprite(draw_sprite);
-    display_sprite(temp_id, draw_sprite.x, draw_sprite.y, 3);
 
-    draw_sprite.x = 92;
-    draw_sprite.y = 40;
+    draw_sprite.x = 180;
     temp_id = load_sprite(draw_sprite);
-    //display_sprite(temp_id, draw_sprite.x, draw_sprite.y, 3);
 
-    draw_sprite.x = 108;
-    draw_sprite.y = 40;
+    draw_sprite.x = 196;
     temp_id = load_sprite(draw_sprite);
-    //display_sprite(temp_id, draw_sprite.x, draw_sprite.y, 3);
 
-    draw_sprite.x = 60;
-    draw_sprite.y = 64;
+    draw_sprite.x = 148;
+    draw_sprite.y = 82;
     temp_id = load_sprite(draw_sprite);
-    //display_sprite(temp_id, draw_sprite.x, draw_sprite.y, 3);
 
-    draw_sprite.y = 80;
-    load_sprite(draw_sprite);
+    draw_sprite.y = 98;
+    temp_id = load_sprite(draw_sprite);
 
-    draw_sprite.x = 76;
-    draw_sprite.y = 96;
-    load_sprite(draw_sprite);
+    draw_sprite.y = 114;
+    temp_id = load_sprite(draw_sprite);
 
-    draw_sprite.x = 93;
-    draw_sprite.y = 96;
-    load_sprite(draw_sprite);
+    draw_sprite.y = 122;
+    draw_sprite.x = 164;
+    temp_id = load_sprite(draw_sprite);
 
-    draw_sprite.x = 109;
-    draw_sprite.y = 96;
-    load_sprite(draw_sprite);
+    draw_sprite.x = 180;
+    temp_id = load_sprite(draw_sprite);
 
-    draw_sprite.y = 93;
-    load_sprite(draw_sprite);
+    draw_sprite.y = 114;
+    draw_sprite.x = 196;
+    temp_id = load_sprite(draw_sprite);
+
+    draw_sprite.y = 98;
+    temp_id = load_sprite(draw_sprite);
+
+    draw_sprite.x = 188;
+    temp_id = load_sprite(draw_sprite);
+
+
+
+
+
+    //Second G
+    draw_sprite.x = 148 + x_offset;
+    draw_sprite.y = 66;
+    temp_id = load_sprite(draw_sprite);
+    
+    draw_sprite.x = 164 + x_offset;
+    temp_id = load_sprite(draw_sprite);
+
+    draw_sprite.x = 180 + x_offset;
+    temp_id = load_sprite(draw_sprite);
+
+    draw_sprite.x = 196 + x_offset;
+    temp_id = load_sprite(draw_sprite);
+
+    draw_sprite.x = 148 + x_offset;
+    draw_sprite.y = 82;
+    temp_id = load_sprite(draw_sprite);
+
+    draw_sprite.y = 98;
+    temp_id = load_sprite(draw_sprite);
+
+    draw_sprite.y = 114;
+    temp_id = load_sprite(draw_sprite);
+
+    draw_sprite.y = 122;
+    draw_sprite.x = 164 + x_offset;
+    temp_id = load_sprite(draw_sprite);
+
+    draw_sprite.x = 180 + x_offset;
+    temp_id = load_sprite(draw_sprite);
+
+    draw_sprite.y = 114;
+    draw_sprite.x = 196 + x_offset;
+    temp_id = load_sprite(draw_sprite);
+
+    draw_sprite.y = 98;
+    temp_id = load_sprite(draw_sprite);
+
+    draw_sprite.x = 188 + x_offset;
+    temp_id = load_sprite(draw_sprite);
+
+
+
 
     for(int i = 0; i < 10000000; ++i) {
         //wait for a bit to display
