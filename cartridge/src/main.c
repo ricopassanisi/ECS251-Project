@@ -145,39 +145,8 @@ int main()
 
     // uint8_t * med_square_data = (uint8_t*) malloc(1024*sizeof(uint8_t));
     uint8_t *med_square_data = (uint8_t *) malloc(1024*sizeof(uint8_t));
-    // uint8_t med_square_data[1024];
-    uint8_t small_square_data[256];
-    uint8_t large_square_data[4096];
-    // fill medium
-    for (int y = 0; y < 32; y++)
-    {
-        for (int x = 0; x < 32; x++)
-        {
-            med_square_data[y * 32 + x] = 1;
-            // MEDIUM_DATA[(1024)+(y*32+x)] = 2;
-        }
-    }
 
-    // fill small
-    for (int y = 0; y < 16; y++)
-    {
-        for (int x = 0; x < 16; ++x)
-        {
-            if (y < 8)
-                small_square_data[y * 16 + x] = 1;
-            else
-                small_square_data[y * 16 + x] = 2;
-        }
-    }
 
-    // fill large
-    for (int y = 0; y < 64; ++y)
-    {
-        for (int x = 0; x < 64; ++x)
-        {
-            large_square_data[y * 64 + x] = 1;
-        }
-    }
 
     // create background in pixel mode:
     //uint8_t background_data[512 * 288];
@@ -187,20 +156,6 @@ int main()
         for (int x = 0; x < 32; ++x)
         {
             int offset = (((y*512)*16)+((x*16)));
-            if(!(x % 2)) {
-                //background_data[offset + (2*512) + 1] = 4;
-                
-            } else {
-                
-            }
-
-            if(!(y % 2)) {
-                
-            }
-            else {
-                //background_data[offset + (3*512) + 6] = 4;
-                
-            }
             background_data[offset + (6*512) + 13] = 4;
             background_data[offset + (3*512) + 9] = 4;
                 //background_data[offset + (9*512) + 3] = 4;
@@ -224,8 +179,8 @@ int main()
 
     uint8_t back_id = load_background(back);
     load_sprite_data(MEDIUM, med_square_data, 0);
-    load_sprite_data(SMALL, small_square_data, 0);
-    load_sprite_data(LARGE, large_square_data, 0);
+    //load_sprite_data(SMALL, small_square_data, 0);
+    //load_sprite_data(LARGE, large_square_data, 0);
     // Create green triangle
     for (int y = 0; y < 32; ++y)
     {
@@ -243,16 +198,42 @@ int main()
         }
     }
 
+
+    
+
+    //fill obstacle datas
+
     uint32_t *sprite_palette = (uint32_t *)malloc(256 * sizeof(uint32_t));
     sprite_palette[1] = 0xFFFF06B5; // A R G B
     sprite_palette[2] = 0xFF00FF00; // Green
     sprite_palette[3] = 0xFF0000FF; // Blue
     sprite_palette[4] = 0xFFFFFFFF; //white
+    sprite_palette[5] = 0xFF9C5A3c; //brown
 
     load_palette(MEDIUM, sprite_palette, 0);
     load_palette(SMALL, sprite_palette, 0);
     load_palette(LARGE, sprite_palette, 0);
     load_background_palette(sprite_palette, 0);
+
+
+    uint8_t * small_obstacle_data = (uint8_t*) malloc(16*16*sizeof(uint8_t));
+    uint8_t * medium_obstacle_data = (uint8_t*) malloc(32*32*sizeof(uint8_t));
+    uint8_t * large_obstacle_data = (uint8_t*) malloc(64*64*sizeof(uint8_t));
+
+    for(int i = 0; i < 64*64; ++i) {
+        //small range:
+        if(i < 16*16) small_obstacle_data[i] = 5;
+        //med range
+        if(i < 32*32) medium_obstacle_data[i] = 5;
+        //large range
+        if(i < 64*64) large_obstacle_data[i] = 5;
+
+    }
+
+    load_sprite_data(SMALL, small_obstacle_data, 5);
+    load_sprite_data(MEDIUM, medium_obstacle_data, 5);
+    load_sprite_data(LARGE, large_obstacle_data, 5);
+
 
     uint32_t *spaceship_palette = (uint32_t *) malloc(256*sizeof(uint32_t));
     spaceship_palette[0] = 0x00000000; //transparent black
@@ -278,7 +259,7 @@ int main()
     square.x = 0;
     square.y = 0;
     square.z = 0;
-    uint16_t id = load_sprite(square);
+    uint16_t spaceship_id = load_sprite(square);
     square.type = SMALL;
     square.data_index = 0;
     square.palette = 0;
@@ -291,21 +272,83 @@ int main()
     display_sprite(small_id, 200, 50, 1);
     display_sprite(large_id, large_x, large_y, 0);
 
+    //initial sprite locations:
+    uint16_t sprite_init_y[8];
+    sprite_init_y[0] = 32;
+    sprite_init_y[1] = 64;
+    sprite_init_y[2] = 96;
+    sprite_init_y[3] = 128;
+    sprite_init_y[4] = 160;
+    sprite_init_y[5] = 192;
+    sprite_init_y[6] = 224;
+    sprite_init_y[7] = 256;
 
+    //do % 8 on timer to "randomly" get new index?
+
+    uint8_t num_small_obstacles, num_medium_obstacles, num_large_obstacles;
+    num_small_obstacles = 8;
+    num_medium_obstacles = 5;
+    num_large_obstacles = 2;
+
+
+    sprite_t small_sprites[8];
+    sprite_t medium_sprites[8];
+    sprite_t large_sprites[8];
+    for(int i = 0; i < 8; ++i) {
+        small_sprites[i].type = SMALL;
+        small_sprites[i].x = 512;
+        small_sprites[i].y = sprite_init_y[i];
+        small_sprites[i].z = 1;
+        small_sprites[i].palette = 0;
+        small_sprites[i].data_index = 5;
+        
+        medium_sprites[i].type = MEDIUM;
+        medium_sprites[i].x = 512;
+        medium_sprites[i].y = sprite_init_y[i];
+        medium_sprites[i].z = 1;
+        medium_sprites[i].palette = 0;
+        medium_sprites[i].data_index = 5;
+
+        large_sprites[i].type = LARGE;
+        large_sprites[i].x = 512;
+        large_sprites[i].y = sprite_init_y[i];
+        large_sprites[i].z = 1;
+        large_sprites[i].palette = 0;
+        large_sprites[i].data_index = 5;
+    }
+
+
+    uint16_t small_obstacle_ids[8];
+    uint16_t medium_obstacle_ids[8];
+    uint16_t large_obstacle_ids[8];
+
+    for(int i = 0; i < 8; ++i) {
+        small_obstacle_ids[i] = 0;
+        medium_obstacle_ids[i] = 0;
+        large_obstacle_ids[i] = 0;
+    }
+
+    small_obstacle_ids[3] = load_sprite(small_sprites[3]);
+    small_obstacle_ids[6] = load_sprite(small_sprites[6]);
+    medium_obstacle_ids[5] = load_sprite(medium_sprites[5]); 
+
+    int8_t small_speed = -5;
+    int8_t medium_speed = -2;
+    int8_t large_speed = -1;
 
     int8_t plusMinus = 1;
     Button controller_status = get_controller();
-    uint16_t square_ids[10];
-    for(int i = 0; i < 10; ++i) {
-        square_ids[i] = create_square(0xFF0000FF);
-        display_sprite(square_ids[i], (34*i),70,1);
-    }
     
     int x_pos = 0;
     int last_x_pos = x_pos;
-    display_sprite(small_id, 200, 50, 1);
+    //display_sprite(small_id, 200, 50, 1);
     free(spaceship_palette);
     free(background_data);
+
+    uint16_t num_deleted_obstacles = 0;
+    uint16_t last_num_deleted_obstacles = 0;
+    uint16_t num_active_obstacles = 3;
+
     while (1) {
         threadYield();
         // int c = a + b + global;
@@ -343,21 +386,107 @@ int main()
             }
             if(x_pos != last_x_pos) {
                 last_x_pos = x_pos;
-                display_sprite(id, (x_pos & 0x3F) << 3, (x_pos >> 6) << 3, 0);
+                display_sprite(spaceship_id, (x_pos & 0x3F) << 3, (x_pos >> 6) << 3, 0);
             }
         }
         if (cmd) { // reset position if cmd pressed
             clear_cmd();
-            delete_sprite(id);
+            delete_sprite(spaceship_id);
             delete_background(back_id);
         }
         if (large_x >= 448) plusMinus = -1;
         if (large_x <= 0) plusMinus = 1;
         last_global = global;
+        //Sprite Movement
         if (glob_init + 5 <= last_global) {
+            for(int i = 0; i < 8; ++i) {
+
+                if(small_obstacle_ids[i]) {
+                    small_sprites[i].x += small_speed;
+                    if(small_sprites[i].x <= 5) {
+                        delete_sprite(small_obstacle_ids[i]);
+                        num_deleted_obstacles++;
+                        small_sprites[i].x = 512;
+                        small_obstacle_ids[i] = 0;
+
+                        //upon deletion, create new one
+                        uint8_t idx = (global + num_deleted_obstacles + i) % 8;
+                        while(small_obstacle_ids[idx]) idx = (global + num_deleted_obstacles + i+1) % 8; //TOODO may cause inf loop
+                        
+                        small_obstacle_ids[idx] = load_sprite(small_sprites[idx]);
+                    } else {
+                        display_sprite(small_obstacle_ids[i],small_sprites[i].x,small_sprites[i].y,1);
+                    }
+                    //small_obstacle_x[i] += small_speed;
+                }
+
+                if(medium_obstacle_ids[i]) {
+                    medium_sprites[i].x += medium_speed;
+                    if(medium_sprites[i].x <= 10) {
+                        delete_sprite(medium_obstacle_ids[i]);
+                        num_deleted_obstacles++;
+                        medium_sprites[i].x = 512;
+                        medium_obstacle_ids[i] = 0;
+
+                        uint8_t idx = (global + num_deleted_obstacles + i) % 8;
+                        while(medium_obstacle_ids[idx]) idx = (global + num_deleted_obstacles + i+1) % 8; //TOODO may cause inf loop
+
+                        medium_obstacle_ids[idx] = load_sprite(medium_sprites[idx]);
+                    } else {
+                        display_sprite(medium_obstacle_ids[i],medium_sprites[i].x,medium_sprites[i].y,1);
+                    }
+                }
+
+                if(large_obstacle_ids[i]) {
+                    large_sprites[i].x += large_speed;
+                    if(large_sprites[i].x <= 20) {
+                        delete_sprite(large_obstacle_ids[i]);
+                        num_deleted_obstacles++;
+                        large_sprites[i].x = 512;
+                        large_obstacle_ids[i] = 0;
+
+                        uint8_t idx = (global + num_deleted_obstacles + i) % 8;
+                        while(large_obstacle_ids[idx]) idx = (global + num_deleted_obstacles + i+1) % 8; //TOODO may cause inf loop
+                        large_obstacle_ids[idx] = load_sprite(large_sprites[idx]);
+                    } else {
+                        display_sprite(large_obstacle_ids[i],medium_sprites[i].x,medium_sprites[i].y,1);
+                    }
+                }
+            }
             glob_init = last_global;
-            large_x += plusMinus;
-            display_sprite(large_id, large_x, large_y, 0);
+            //large_x += plusMinus;
+            //display_sprite(large_id, large_x, large_y, 0);
+            //update #active obstacles
+            if(num_active_obstacles < 9 && (num_deleted_obstacles > (5 + last_num_deleted_obstacles))) {
+                last_num_deleted_obstacles = num_deleted_obstacles;
+                num_active_obstacles++;
+                int idx = (global + num_deleted_obstacles) % 8;
+                switch(num_active_obstacles) {
+                    case 4:
+                        //create new small
+                        small_obstacle_ids[idx] = load_sprite(small_sprites[idx]);
+                        break;
+                    case 5:
+                        //create new medium
+                        medium_obstacle_ids[idx] = load_sprite(medium_sprites[idx]);
+                        break;
+                    case 6:
+                        large_obstacle_ids[idx] = load_sprite(large_sprites[idx]);
+                        break;
+                    case 7:
+                        medium_obstacle_ids[idx] = load_sprite(medium_sprites[idx]);
+                        break;
+                    case 8:
+                        small_obstacle_ids[idx] = load_sprite(small_sprites[idx]);
+                        break;
+                    case 9:
+                        large_obstacle_ids[idx] = load_sprite(large_sprites[idx]);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
         }
     }
     return 0;
