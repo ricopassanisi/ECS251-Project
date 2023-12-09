@@ -271,7 +271,6 @@ int main()
     large_y = 80;
     display_sprite(small_id, 200, 50, 1);
     display_sprite(large_id, large_x, large_y, 0);
-
     //initial sprite locations:
     uint16_t sprite_init_y[8];
     sprite_init_y[0] = 32;
@@ -329,7 +328,6 @@ int main()
     }
 
     small_obstacle_ids[3] = load_sprite(small_sprites[3]);
-    small_obstacle_ids[6] = load_sprite(small_sprites[6]);
     medium_obstacle_ids[5] = load_sprite(medium_sprites[5]); 
 
     int8_t small_speed = -5;
@@ -340,14 +338,16 @@ int main()
     Button controller_status = get_controller();
     
     int x_pos = 0;
-    int last_x_pos = x_pos;
+    uint16_t spaceship_x = 20;
+    uint16_t spaceship_y = 128;
+    int last_y_pos = spaceship_y;
     //display_sprite(small_id, 200, 50, 1);
     free(spaceship_palette);
     free(background_data);
 
     uint16_t num_deleted_obstacles = 0;
     uint16_t last_num_deleted_obstacles = 0;
-    uint16_t num_active_obstacles = 3;
+    uint16_t num_active_obstacles = 2;
 
     while (1) {
         threadYield();
@@ -359,23 +359,13 @@ int main()
             
             switch (controller_status) {
             case w:
-                if (x_pos >= 0x40) {
-                    x_pos -= 0x40;
-                }
-                break;
-            case a:
-                if (x_pos & 0x3F){
-                    x_pos--;
+                if (spaceship_y >= 0) {
+                    spaceship_y -= 1;
                 }
                 break;
             case x:
-                if (x_pos < 0x8C0){
-                    x_pos += 0x40;
-                }
-                break;
-            case d:
-                if ((x_pos & 0x3F) != 0x3F){
-                    x_pos++;
+                if (spaceship_y < 256){
+                    spaceship_y += 1;
                 }
                 break;
             case i:
@@ -384,9 +374,9 @@ int main()
             default:
                 break;
             }
-            if(x_pos != last_x_pos) {
-                last_x_pos = x_pos;
-                display_sprite(spaceship_id, (x_pos & 0x3F) << 3, (x_pos >> 6) << 3, 0);
+            if(spaceship_y != last_y_pos) {
+                last_y_pos = spaceship_y;
+                display_sprite(spaceship_id, spaceship_x, spaceship_y, 0);
             }
         }
         if (cmd) { // reset position if cmd pressed
@@ -411,8 +401,11 @@ int main()
 
                         //upon deletion, create new one
                         uint8_t idx = (global + num_deleted_obstacles + i) % 8;
-                        while(small_obstacle_ids[idx]) idx = (global + num_deleted_obstacles + i+1) % 8; //TOODO may cause inf loop
-                        
+                        uint8_t temp = 1;
+                        while(small_obstacle_ids[idx]) {
+                            idx = (global + num_deleted_obstacles + i+temp) % 8; //TOODO may cause inf loop
+                            temp++;
+                        }
                         small_obstacle_ids[idx] = load_sprite(small_sprites[idx]);
                     } else {
                         display_sprite(small_obstacle_ids[i],small_sprites[i].x,small_sprites[i].y,1);
@@ -429,8 +422,12 @@ int main()
                         medium_obstacle_ids[i] = 0;
 
                         uint8_t idx = (global + num_deleted_obstacles + i) % 8;
-                        while(medium_obstacle_ids[idx]) idx = (global + num_deleted_obstacles + i+1) % 8; //TOODO may cause inf loop
-
+                        //while(medium_obstacle_ids[idx]) idx = (global + num_deleted_obstacles + i+1) % 8; //TOODO may cause inf loop
+                        uint8_t temp = 1;
+                        while(medium_obstacle_ids[idx]) {
+                            idx = (global + num_deleted_obstacles + i+temp) % 8;
+                            temp++;
+                        }
                         medium_obstacle_ids[idx] = load_sprite(medium_sprites[idx]);
                     } else {
                         display_sprite(medium_obstacle_ids[i],medium_sprites[i].x,medium_sprites[i].y,1);
@@ -444,12 +441,15 @@ int main()
                         num_deleted_obstacles++;
                         large_sprites[i].x = 512;
                         large_obstacle_ids[i] = 0;
-
+                        uint8_t temp = 1;
                         uint8_t idx = (global + num_deleted_obstacles + i) % 8;
-                        while(large_obstacle_ids[idx]) idx = (global + num_deleted_obstacles + i+1) % 8; //TOODO may cause inf loop
+                        while(large_obstacle_ids[idx]) {
+                            idx = (global + num_deleted_obstacles + i+temp) % 8; //TOODO may cause inf loop
+                            temp++;
+                        }
                         large_obstacle_ids[idx] = load_sprite(large_sprites[idx]);
                     } else {
-                        display_sprite(large_obstacle_ids[i],medium_sprites[i].x,medium_sprites[i].y,1);
+                        display_sprite(large_obstacle_ids[i],large_sprites[i].x,large_sprites[i].y,1);
                     }
                 }
             }
@@ -461,31 +461,66 @@ int main()
                 last_num_deleted_obstacles = num_deleted_obstacles;
                 num_active_obstacles++;
                 int idx = (global + num_deleted_obstacles) % 8;
+                uint8_t temp = 0;
                 switch(num_active_obstacles) {
+                    case 3:
+                        while(small_obstacle_ids[idx]) {
+                            idx = (global + num_deleted_obstacles + temp) % 8;
+                            temp++;
+                        }
+                        small_obstacle_ids[idx] = load_sprite(small_sprites[idx]);
+                        break;
                     case 4:
                         //create new small
+                        while(small_obstacle_ids[idx]) {
+                            idx = (global + num_deleted_obstacles + temp) % 8;
+                            temp++;
+                        }
                         small_obstacle_ids[idx] = load_sprite(small_sprites[idx]);
                         break;
                     case 5:
                         //create new medium
+                        while(medium_obstacle_ids[idx]) {
+                            idx = (global + num_deleted_obstacles + temp) % 8;
+                            temp++;
+                        }
                         medium_obstacle_ids[idx] = load_sprite(medium_sprites[idx]);
                         break;
                     case 6:
+                        while(large_obstacle_ids[idx]) {
+                            idx = (global + num_deleted_obstacles + temp) % 8;
+                            temp++;
+                        }
                         large_obstacle_ids[idx] = load_sprite(large_sprites[idx]);
                         break;
                     case 7:
+                        while(medium_obstacle_ids[idx]) {
+                            idx = (global + num_deleted_obstacles + temp) % 8;
+                            temp++;
+                        }
                         medium_obstacle_ids[idx] = load_sprite(medium_sprites[idx]);
                         break;
                     case 8:
+                        while(small_obstacle_ids[idx]) {
+                            idx = (global + num_deleted_obstacles + temp) % 8;
+                            temp++;
+                        }
                         small_obstacle_ids[idx] = load_sprite(small_sprites[idx]);
                         break;
                     case 9:
+                        while(large_obstacle_ids[idx]) {
+                            idx = (global + num_deleted_obstacles + temp) % 8;
+                            temp++;
+                        }
                         large_obstacle_ids[idx] = load_sprite(large_sprites[idx]);
                         break;
                     default:
                         break;
                 }
             }
+
+            //check collisions
+            
 
         }
     }
