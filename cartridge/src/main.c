@@ -8,6 +8,8 @@
 
 void display_game_over(void);
 void load_spaceship_data(uint8_t *med_buffer);
+void load_obstacle_data(uint8_t *small_buf, uint8_t *med_buffer, uint8_t *large_buffer);
+void move_obstacles(uint16_t *obstacle_ids, sprite_t *sprites, int8_t speed, uint16_t *num_deleted_obstacles, uint32_t global);
 
 int main()
 {
@@ -36,9 +38,6 @@ int main()
             background_data[offset + (2*512) + 2] = 4;
                 //background_data[offset + (10*512) + 8] = 4;
             background_data[offset + (12*512) + 4] = 4;
-            
-            
-            //background_data[y * 512 + x] = 2;
         }
     }
 
@@ -73,45 +72,7 @@ int main()
     uint8_t * medium_obstacle_data = (uint8_t*) malloc(32*32*sizeof(uint8_t));
     uint8_t * large_obstacle_data = (uint8_t*) malloc(64*64*sizeof(uint8_t));
 
-    for(int i = 0; i < 64*64; ++i) {
-        //small range:
-        if(i < 16*16) small_obstacle_data[i] = 5;
-        //med range
-        if(i < 32*32) medium_obstacle_data[i] = 5;
-        //large range
-        if(i < 64*64) large_obstacle_data[i] = 5;
-
-    }
-
-    for(int i = 0; i < 4; ++i) {
-        for(int j = 0; j < 4-i; ++j) {
-            small_obstacle_data[(i*16) + j] = 0;
-            small_obstacle_data[(i*16) + (15-j)] = 0;
-
-            small_obstacle_data[((15-i)*16) + j] = 0;
-            small_obstacle_data[((15-i)*16) + (15-j)] = 0;
-        }
-    }
-
-    for(int i = 0; i < 8; ++i) {
-        for(int j = 0; j < 8-i; ++j) {
-            medium_obstacle_data[(i*32) + j] = 0;
-            medium_obstacle_data[(i*32) + (31-j)] = 0;
-
-            medium_obstacle_data[((31-i)*32) + j] = 0;
-            medium_obstacle_data[((31-i)*32) + (31-j)] = 0;
-        }
-    }
-
-    for(int i = 0; i < 16; ++i) {
-        for(int j = 0; j < 16-i; ++j) {
-            large_obstacle_data[(i*64) + j] = 0;
-            large_obstacle_data[(i*64) + (63-j)] = 0;
-
-            large_obstacle_data[((63-i)*64) + j] = 0;
-            large_obstacle_data[((63-i)*64) + (63-j)] = 0;
-        }
-    }
+    load_obstacle_data(small_obstacle_data,medium_obstacle_data,large_obstacle_data);
 
     load_sprite_data(SMALL, small_obstacle_data, 5);
     load_sprite_data(MEDIUM, medium_obstacle_data, 5);
@@ -166,11 +127,6 @@ int main()
     sprite_init_y[7] = 256;
 
     //do % 8 on timer to "randomly" get new index?
-
-    uint8_t num_small_obstacles, num_medium_obstacles, num_large_obstacles;
-    num_small_obstacles = 8;
-    num_medium_obstacles = 5;
-    num_large_obstacles = 2;
 
 
     sprite_t small_sprites[8];
@@ -242,95 +198,36 @@ int main()
             controller_status = get_controller();
             
             switch (controller_status) {
-            case w:
-                if (spaceship_y > 0) {
-                    spaceship_y -= 1;
-                }
-                break;
-            case x:
-                if (spaceship_y < 256){
-                    spaceship_y += 1;
-                }
-                break;
-            default:
-                break;
+                case w:
+                    if (spaceship_y > 0) {
+                        spaceship_y -= 1;
+                    }
+                    break;
+                case x:
+                    if (spaceship_y < 256){
+                        spaceship_y += 1;
+                    }
+                    break;
+                default:
+                    break;
             }
             if(spaceship_y != last_y_pos) {
                 last_y_pos = spaceship_y;
                 display_sprite(spaceship_id, spaceship_x, spaceship_y, 0);
             }
         }
-        if (cmd) { // reset position if cmd pressed
+        if (cmd) { // Do something with cmd button?
             clear_cmd();
-            delete_sprite(spaceship_id);
-            delete_background(back_id);
         }
         last_global = global;
         //Sprite Movement
         if (glob_init + 5 <= last_global) {
-            for(int i = 0; i < 8; ++i) {
-
-                if(small_obstacle_ids[i]) {
-                    small_sprites[i].x += small_speed - (i % 3);
-                    if(small_sprites[i].x <= -15) {
-                        delete_sprite(small_obstacle_ids[i]);
-                        num_deleted_obstacles++;
-                        small_sprites[i].x = 512;
-                        small_obstacle_ids[i] = 0;
-
-                        //upon deletion, create new one
-                        uint8_t idx = (global + num_deleted_obstacles + i) % 8;
-                        uint8_t temp = 1;
-                        while(small_obstacle_ids[idx]) {
-                            idx = (global + num_deleted_obstacles + i+temp) % 8; //TOODO may cause inf loop
-                            temp++;
-                        }
-                        small_obstacle_ids[idx] = load_sprite(small_sprites[idx]);
-                    } else {
-                        display_sprite(small_obstacle_ids[i],small_sprites[i].x,small_sprites[i].y,1);
-                    }
-                    //small_obstacle_x[i] += small_speed;
-                }
-
-                if(medium_obstacle_ids[i]) {
-                    medium_sprites[i].x += medium_speed - (i % 3);
-                    if(medium_sprites[i].x <= -32) {
-                        delete_sprite(medium_obstacle_ids[i]);
-                        num_deleted_obstacles++;
-                        medium_sprites[i].x = 512;
-                        medium_obstacle_ids[i] = 0;
-                        uint8_t idx = (global + num_deleted_obstacles + i) % 8;
-                        uint8_t temp = 1;
-                        while(medium_obstacle_ids[idx]) {
-                            idx = (global + num_deleted_obstacles + i+temp) % 8;
-                            temp++;
-                        }
-                        medium_obstacle_ids[idx] = load_sprite(medium_sprites[idx]);
-                    } else {
-                        display_sprite(medium_obstacle_ids[i],medium_sprites[i].x,medium_sprites[i].y,1);
-                    }
-                }
-
-                if(large_obstacle_ids[i]) {
-                    large_sprites[i].x += large_speed - (i % 3);
-                    if(large_sprites[i].x <= -64) {
-                        delete_sprite(large_obstacle_ids[i]);
-                        num_deleted_obstacles++;
-                        large_sprites[i].x = 512;
-                        large_obstacle_ids[i] = 0;
-                        uint8_t temp = 1;
-                        uint8_t idx = (global + num_deleted_obstacles + i) % 8;
-                        while(large_obstacle_ids[idx]) {
-                            idx = (global + num_deleted_obstacles + i+temp) % 8; 
-                            temp++;
-                        }
-                        large_obstacle_ids[idx] = load_sprite(large_sprites[idx]);
-                    } else {
-                        display_sprite(large_obstacle_ids[i],large_sprites[i].x,large_sprites[i].y,1);
-                    }
-                }
-            }
             glob_init = last_global;
+
+            //void move_obstacles(uint16_t *obstacle_ids, sprite_t *sprites, int8_t speed, uint16_t *num_deleted_obstacles, uint32_t global)
+            move_obstacles(small_obstacle_ids, small_sprites, small_speed, &num_deleted_obstacles, global);
+            move_obstacles(medium_obstacle_ids, medium_sprites, medium_speed, &num_deleted_obstacles, global);
+            move_obstacles(large_obstacle_ids, large_sprites, large_speed, &num_deleted_obstacles, global);
             //large_x += plusMinus;
             //display_sprite(large_id, large_x, large_y, 0);
             //update #active obstacles
@@ -431,6 +328,49 @@ int main()
         }
     }
     return 0;
+}
+
+
+void load_obstacle_data(uint8_t *small_obstacle_data, uint8_t *medium_obstacle_data, uint8_t *large_obstacle_data) {
+    for(int i = 0; i < 64*64; ++i) {
+        //small range:
+        if(i < 16*16) small_obstacle_data[i] = 5;
+        //med range
+        if(i < 32*32) medium_obstacle_data[i] = 5;
+        //large range
+        if(i < 64*64) large_obstacle_data[i] = 5;
+
+    }
+
+    for(int i = 0; i < 4; ++i) {
+        for(int j = 0; j < 4-i; ++j) {
+            small_obstacle_data[(i*16) + j] = 0;
+            small_obstacle_data[(i*16) + (15-j)] = 0;
+
+            small_obstacle_data[((15-i)*16) + j] = 0;
+            small_obstacle_data[((15-i)*16) + (15-j)] = 0;
+        }
+    }
+
+    for(int i = 0; i < 8; ++i) {
+        for(int j = 0; j < 8-i; ++j) {
+            medium_obstacle_data[(i*32) + j] = 0;
+            medium_obstacle_data[(i*32) + (31-j)] = 0;
+
+            medium_obstacle_data[((31-i)*32) + j] = 0;
+            medium_obstacle_data[((31-i)*32) + (31-j)] = 0;
+        }
+    }
+
+    for(int i = 0; i < 16; ++i) {
+        for(int j = 0; j < 16-i; ++j) {
+            large_obstacle_data[(i*64) + j] = 0;
+            large_obstacle_data[(i*64) + (63-j)] = 0;
+
+            large_obstacle_data[((63-i)*64) + j] = 0;
+            large_obstacle_data[((63-i)*64) + (63-j)] = 0;
+        }
+    }
 }
 
 
@@ -551,7 +491,88 @@ void load_spaceship_data(uint8_t *med_buffer) {
     med_buffer[y_off_permanent + (25*32) + 15] = 1;
 }
 
+void move_obstacles(uint16_t *obstacle_ids, sprite_t *sprites, int8_t speed, uint16_t *num_deleted_obstacles, uint32_t global) {
+    for (int i = 0; i < 8; ++i)
+    {
+        if (obstacle_ids[i])
+        {
+            sprites[i].x += speed - (i % 3);
+            if (sprites[i].x <= -15)
+            {
+                delete_sprite(obstacle_ids[i]);
+                *num_deleted_obstacles = *num_deleted_obstacles + 1;
+                sprites[i].x = 512;
+                obstacle_ids[i] = 0;
 
+                // upon deletion, create new one
+                uint8_t idx = (global + (*num_deleted_obstacles) + i) % 8;
+                uint8_t temp = 1;
+                while (obstacle_ids[idx])
+                {
+                    idx = (global + (*num_deleted_obstacles) + i + temp) % 8; // TOODO may cause inf loop
+                    temp++;
+                }
+                sprites[idx].x = 512;
+                obstacle_ids[idx] = load_sprite(sprites[idx]);
+            }
+            else
+            {
+                display_sprite(obstacle_ids[i], sprites[i].x, sprites[i].y, 1);
+            }
+            // small_obstacle_x[i] += small_speed;
+        }
+
+        /*if (medium_obstacle_ids[i])
+        {
+            medium_sprites[i].x += medium_speed - (i % 3);
+            if (medium_sprites[i].x <= -32)
+            {
+                delete_sprite(medium_obstacle_ids[i]);
+                num_deleted_obstacles++;
+                medium_sprites[i].x = 512;
+                medium_obstacle_ids[i] = 0;
+                uint8_t idx = (global + num_deleted_obstacles + i) % 8;
+                uint8_t temp = 1;
+                while (medium_obstacle_ids[idx])
+                {
+                    idx = (global + num_deleted_obstacles + i + temp) % 8;
+                    temp++;
+                }
+                medium_sprites[idx].x = 512;
+                medium_obstacle_ids[idx] = load_sprite(medium_sprites[idx]);
+            }
+            else
+            {
+                display_sprite(medium_obstacle_ids[i], medium_sprites[i].x, medium_sprites[i].y, 1);
+            }
+        }
+
+        if (large_obstacle_ids[i])
+        {
+            large_sprites[i].x += large_speed - (i % 3);
+            if (large_sprites[i].x <= -64)
+            {
+                delete_sprite(large_obstacle_ids[i]);
+                num_deleted_obstacles++;
+                large_sprites[i].x = 512;
+                large_obstacle_ids[i] = 0;
+                uint8_t temp = 1;
+                uint8_t idx = (global + num_deleted_obstacles + i) % 8;
+                while (large_obstacle_ids[idx])
+                {
+                    idx = (global + num_deleted_obstacles + i + temp) % 8;
+                    temp++;
+                }
+                large_sprites[idx].x = 512;
+                large_obstacle_ids[idx] = load_sprite(large_sprites[idx]);
+            }
+            else
+            {
+                display_sprite(large_obstacle_ids[i], large_sprites[i].x, large_sprites[i].y, 1);
+            }
+        }*/
+    }
+}
 
 void display_game_over(void) {
     //create completely black background:
