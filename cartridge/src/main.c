@@ -7,133 +7,7 @@
 #include <util.h>
 
 void display_game_over(void);
-
-//fill data of buffer with spaceship data
-void load_spaceship_data(uint8_t *med_buffer) {
-    /* spaceship_palette[0] = 0x00000000; //transparent black
-    spaceship_palette[1] = 0xFF303030; //Dark Grey
-    spaceship_palette[2] = 0xFF545454; //Med grey
-    spaceship_palette[3] = 0xFF787878; //light grey
-    spaceship_palette[4] = 0xFFFF0000; //red
-    spaceship_palette[5] = 0xFFFF8400; //orange
-    spaceship_palette[6] = 0xFFFFFF00; //yellow
-    spaceship_palette[7] = 0xFF00BBFF; //light blue */
-    int y_off_permanent = 2*32; //kinda screwed up the pixel drawing so need this
-    med_buffer[y_off_permanent + (1*32) + 9] = 6;
-    med_buffer[y_off_permanent + (1*32) + 10] = 5;
-    med_buffer[y_off_permanent + (1*32) + 11] = 4;
-    med_buffer[y_off_permanent + (1*32) + 12] = 1;
-    med_buffer[y_off_permanent + (1*32) + 13] = 1;
-    med_buffer[y_off_permanent + (1*32) + 14] = 1;
-    med_buffer[y_off_permanent + (1*32) + 15] = 1;
-
-    med_buffer[y_off_permanent + (2*32) + 10] = 6;
-    med_buffer[y_off_permanent + (2*32) + 11] = 4;
-    med_buffer[y_off_permanent + (2*32) + 12] = 2;
-    med_buffer[y_off_permanent + (2*32) + 13] = 1;
-    med_buffer[y_off_permanent + (2*32) + 14] = 1;
-
-    med_buffer[y_off_permanent + (3*32) + 12] = 2;
-    med_buffer[y_off_permanent + (3*32) + 12] = 1;
-
-    med_buffer[y_off_permanent + (4*32) + 12] = 2;
-    med_buffer[y_off_permanent + (5*32) + 12] = 2;
-
-    for(int y = 6; y <= 9; ++y) {
-        med_buffer[y_off_permanent + (y*32) + 12] = 3;
-        med_buffer[y_off_permanent + (y*32) + 13] = 2;
-
-        med_buffer[y_off_permanent + ((y+11)*32) + 12] = 3;
-        med_buffer[y_off_permanent + ((y+11)*32) + 13] = 2;
-    }
-
-    
-    med_buffer[y_off_permanent + (10*32) + 8] = 2;
-    med_buffer[y_off_permanent + (10*32) + 9] = 2;
-    med_buffer[y_off_permanent + (10*32) + 12] = 2; 
-    med_buffer[y_off_permanent + (10*32) + 13] = 3; 
-    med_buffer[y_off_permanent + (10*32) + 14] = 2; 
-
-    med_buffer[y_off_permanent + (11*32) + 7] = 3;
-    med_buffer[y_off_permanent + (11*32) + 8] = 3;
-    med_buffer[y_off_permanent + (11*32) + 9] = 2;
-    med_buffer[y_off_permanent + (11*32) + 10] = 2;
-    med_buffer[y_off_permanent + (11*32) + 11] = 1;
-    med_buffer[y_off_permanent + (11*32) + 12] = 2;
-    med_buffer[y_off_permanent + (11*32) + 13] = 2;
-    med_buffer[y_off_permanent + (11*32) + 14] = 3;
-    med_buffer[y_off_permanent + (11*32) + 15] = 3;
-    med_buffer[y_off_permanent + (11*32) + 16] = 3;
-    med_buffer[y_off_permanent + (11*32) + 17] = 3;
-
-    med_buffer[y_off_permanent + (13*32) + 4] = 6;
-    med_buffer[y_off_permanent + (13*32) + 25] = 3;
-    med_buffer[y_off_permanent + (13*32) + 26] = 3;
-    int topbotval = 6;
-    int midval = 5;
-    for(int x = 5; x < 25; ++x) {
-        if(x == 6) {
-            topbotval = 5;
-            midval = 4;
-        } else if(x == 7) {
-            topbotval = topbotval = 4;
-            midval = 3;
-        }else if(x == 10) {
-            topbotval = 2;
-        } else if(x == 12) {
-            topbotval = 1;
-            midval = 2;
-        } else if(x == 15) {
-            midval = 7;
-        } else if(x == 17) {
-            topbotval = 3;
-        } else if(x == 24) {
-            midval = 3;
-        }
-        med_buffer[y_off_permanent + (12*32) + x] = topbotval;
-        med_buffer[y_off_permanent + (13*32) + x] = midval;
-        med_buffer[y_off_permanent + (14*32) + x] = topbotval;
-    }
-
-    med_buffer[y_off_permanent + (15*32) + 7] = 3;
-    med_buffer[y_off_permanent + (15*32) + 8] = 3;
-    med_buffer[y_off_permanent + (15*32) + 9] = 2;
-    med_buffer[y_off_permanent + (15*32) + 10] = 2;
-    med_buffer[y_off_permanent + (15*32) + 11] = 1;
-    med_buffer[y_off_permanent + (15*32) + 12] = 2;
-    med_buffer[y_off_permanent + (15*32) + 13] = 2;
-    med_buffer[y_off_permanent + (15*32) + 14] = 3;
-    med_buffer[y_off_permanent + (15*32) + 15] = 3;
-    med_buffer[y_off_permanent + (15*32) + 16] = 3;
-    med_buffer[y_off_permanent + (15*32) + 17] = 3;
-
-    med_buffer[y_off_permanent + (16*32) + 8] = 2;
-    med_buffer[y_off_permanent + (16*32) + 9] = 2;
-    med_buffer[y_off_permanent + (16*32) + 12] = 2; 
-    med_buffer[y_off_permanent + (16*32) + 13] = 3; 
-    med_buffer[y_off_permanent + (16*32) + 14] = 2; 
-
-    med_buffer[y_off_permanent + (21*32) + 12] = 2;
-    med_buffer[y_off_permanent + (22*32) + 12] = 2;
-
-    med_buffer[y_off_permanent + (23*32) + 12] = 2;
-    med_buffer[y_off_permanent + (23*32) + 12] = 1;
-
-    med_buffer[y_off_permanent + (24*32) + 10] = 6;
-    med_buffer[y_off_permanent + (24*32) + 11] = 4;
-    med_buffer[y_off_permanent + (24*32) + 12] = 2;
-    med_buffer[y_off_permanent + (24*32) + 13] = 1;
-    med_buffer[y_off_permanent + (24*32) + 14] = 1;
-
-    med_buffer[y_off_permanent + (25*32) + 9] = 6;
-    med_buffer[y_off_permanent + (25*32) + 10] = 5;
-    med_buffer[y_off_permanent + (25*32) + 11] = 4;
-    med_buffer[y_off_permanent + (25*32) + 12] = 1;
-    med_buffer[y_off_permanent + (25*32) + 13] = 1;
-    med_buffer[y_off_permanent + (25*32) + 14] = 1;
-    med_buffer[y_off_permanent + (25*32) + 15] = 1;
-}
-
+void load_spaceship_data(uint8_t *med_buffer);
 
 int main()
 {
@@ -265,22 +139,22 @@ int main()
     square.type = MEDIUM;
     square.data_index = 1;
     square.palette = 1;
-    square.x = 0;
-    square.y = 0;
-    square.z = 0;
+    square.x = 20;
+    square.y = 128;
+    square.z = 1;
     uint16_t spaceship_id = load_sprite(square);
     square.type = SMALL;
     square.data_index = 0;
-    square.palette = 0;
+    square.palette = 3;
+    square.x = 512;
+    square.y = 288;
+    square.z = 0;
+    //DO NOT DELETE, NEED THESE TO TAKE UP SMALL AND LARGE 0 IDs
     uint16_t small_id = load_sprite(square);
     square.type = LARGE;
     uint16_t large_id = load_sprite(square);
-    uint16_t large_x, large_y;
-    large_x = 80;
-    large_y = 80;
-    display_sprite(small_id, 200, 50, 1);
-    display_sprite(large_id, large_x, large_y, 0);
-    //initial sprite locations:
+
+    
     uint16_t sprite_init_y[8];
     sprite_init_y[0] = 32;
     sprite_init_y[1] = 64;
@@ -336,7 +210,7 @@ int main()
         large_obstacle_ids[i] = 0;
     }
 
-    small_obstacle_ids[3] = load_sprite(small_sprites[3]);
+    small_obstacle_ids[1] = load_sprite(small_sprites[3]);
     medium_obstacle_ids[5] = load_sprite(medium_sprites[5]); 
 
     int8_t small_speed = -5;
@@ -369,7 +243,7 @@ int main()
             
             switch (controller_status) {
             case w:
-                if (spaceship_y >= 0) {
+                if (spaceship_y > 0) {
                     spaceship_y -= 1;
                 }
                 break;
@@ -377,9 +251,6 @@ int main()
                 if (spaceship_y < 256){
                     spaceship_y += 1;
                 }
-                break;
-            case i:
-                display_game_over();
                 break;
             default:
                 break;
@@ -394,16 +265,14 @@ int main()
             delete_sprite(spaceship_id);
             delete_background(back_id);
         }
-        if (large_x >= 448) plusMinus = -1;
-        if (large_x <= 0) plusMinus = 1;
         last_global = global;
         //Sprite Movement
         if (glob_init + 5 <= last_global) {
             for(int i = 0; i < 8; ++i) {
 
                 if(small_obstacle_ids[i]) {
-                    small_sprites[i].x += small_speed;
-                    if(small_sprites[i].x <= -16) {
+                    small_sprites[i].x += small_speed - (i % 3);
+                    if(small_sprites[i].x <= -15) {
                         delete_sprite(small_obstacle_ids[i]);
                         num_deleted_obstacles++;
                         small_sprites[i].x = 512;
@@ -424,7 +293,7 @@ int main()
                 }
 
                 if(medium_obstacle_ids[i]) {
-                    medium_sprites[i].x += medium_speed;
+                    medium_sprites[i].x += medium_speed - (i % 3);
                     if(medium_sprites[i].x <= -32) {
                         delete_sprite(medium_obstacle_ids[i]);
                         num_deleted_obstacles++;
@@ -443,7 +312,7 @@ int main()
                 }
 
                 if(large_obstacle_ids[i]) {
-                    large_sprites[i].x += large_speed;
+                    large_sprites[i].x += large_speed - (i % 3);
                     if(large_sprites[i].x <= -64) {
                         delete_sprite(large_obstacle_ids[i]);
                         num_deleted_obstacles++;
@@ -562,6 +431,124 @@ int main()
         }
     }
     return 0;
+}
+
+
+void load_spaceship_data(uint8_t *med_buffer) {
+    int y_off_permanent = 2*32; //kinda screwed up the pixel drawing so need this
+    med_buffer[y_off_permanent + (1*32) + 9] = 6;
+    med_buffer[y_off_permanent + (1*32) + 10] = 5;
+    med_buffer[y_off_permanent + (1*32) + 11] = 4;
+    med_buffer[y_off_permanent + (1*32) + 12] = 1;
+    med_buffer[y_off_permanent + (1*32) + 13] = 1;
+    med_buffer[y_off_permanent + (1*32) + 14] = 1;
+    med_buffer[y_off_permanent + (1*32) + 15] = 1;
+
+    med_buffer[y_off_permanent + (2*32) + 10] = 6;
+    med_buffer[y_off_permanent + (2*32) + 11] = 4;
+    med_buffer[y_off_permanent + (2*32) + 12] = 2;
+    med_buffer[y_off_permanent + (2*32) + 13] = 1;
+    med_buffer[y_off_permanent + (2*32) + 14] = 1;
+
+    med_buffer[y_off_permanent + (3*32) + 12] = 2;
+    med_buffer[y_off_permanent + (3*32) + 12] = 1;
+
+    med_buffer[y_off_permanent + (4*32) + 12] = 2;
+    med_buffer[y_off_permanent + (5*32) + 12] = 2;
+
+    for(int y = 6; y <= 9; ++y) {
+        med_buffer[y_off_permanent + (y*32) + 12] = 3;
+        med_buffer[y_off_permanent + (y*32) + 13] = 2;
+
+        med_buffer[y_off_permanent + ((y+11)*32) + 12] = 3;
+        med_buffer[y_off_permanent + ((y+11)*32) + 13] = 2;
+    }
+
+    
+    med_buffer[y_off_permanent + (10*32) + 8] = 2;
+    med_buffer[y_off_permanent + (10*32) + 9] = 2;
+    med_buffer[y_off_permanent + (10*32) + 12] = 2; 
+    med_buffer[y_off_permanent + (10*32) + 13] = 3; 
+    med_buffer[y_off_permanent + (10*32) + 14] = 2; 
+
+    med_buffer[y_off_permanent + (11*32) + 7] = 3;
+    med_buffer[y_off_permanent + (11*32) + 8] = 3;
+    med_buffer[y_off_permanent + (11*32) + 9] = 2;
+    med_buffer[y_off_permanent + (11*32) + 10] = 2;
+    med_buffer[y_off_permanent + (11*32) + 11] = 1;
+    med_buffer[y_off_permanent + (11*32) + 12] = 2;
+    med_buffer[y_off_permanent + (11*32) + 13] = 2;
+    med_buffer[y_off_permanent + (11*32) + 14] = 3;
+    med_buffer[y_off_permanent + (11*32) + 15] = 3;
+    med_buffer[y_off_permanent + (11*32) + 16] = 3;
+    med_buffer[y_off_permanent + (11*32) + 17] = 3;
+
+    med_buffer[y_off_permanent + (13*32) + 4] = 6;
+    med_buffer[y_off_permanent + (13*32) + 25] = 3;
+    med_buffer[y_off_permanent + (13*32) + 26] = 3;
+    int topbotval = 6;
+    int midval = 5;
+    for(int x = 5; x < 25; ++x) {
+        if(x == 6) {
+            topbotval = 5;
+            midval = 4;
+        } else if(x == 7) {
+            topbotval = topbotval = 4;
+            midval = 3;
+        }else if(x == 10) {
+            topbotval = 2;
+        } else if(x == 12) {
+            topbotval = 1;
+            midval = 2;
+        } else if(x == 15) {
+            midval = 7;
+        } else if(x == 17) {
+            topbotval = 3;
+        } else if(x == 24) {
+            midval = 3;
+        }
+        med_buffer[y_off_permanent + (12*32) + x] = topbotval;
+        med_buffer[y_off_permanent + (13*32) + x] = midval;
+        med_buffer[y_off_permanent + (14*32) + x] = topbotval;
+    }
+
+    med_buffer[y_off_permanent + (15*32) + 7] = 3;
+    med_buffer[y_off_permanent + (15*32) + 8] = 3;
+    med_buffer[y_off_permanent + (15*32) + 9] = 2;
+    med_buffer[y_off_permanent + (15*32) + 10] = 2;
+    med_buffer[y_off_permanent + (15*32) + 11] = 1;
+    med_buffer[y_off_permanent + (15*32) + 12] = 2;
+    med_buffer[y_off_permanent + (15*32) + 13] = 2;
+    med_buffer[y_off_permanent + (15*32) + 14] = 3;
+    med_buffer[y_off_permanent + (15*32) + 15] = 3;
+    med_buffer[y_off_permanent + (15*32) + 16] = 3;
+    med_buffer[y_off_permanent + (15*32) + 17] = 3;
+
+    med_buffer[y_off_permanent + (16*32) + 8] = 2;
+    med_buffer[y_off_permanent + (16*32) + 9] = 2;
+    med_buffer[y_off_permanent + (16*32) + 12] = 2; 
+    med_buffer[y_off_permanent + (16*32) + 13] = 3; 
+    med_buffer[y_off_permanent + (16*32) + 14] = 2; 
+
+    med_buffer[y_off_permanent + (21*32) + 12] = 2;
+    med_buffer[y_off_permanent + (22*32) + 12] = 2;
+
+    med_buffer[y_off_permanent + (23*32) + 12] = 2;
+    med_buffer[y_off_permanent + (23*32) + 12] = 1;
+
+    med_buffer[y_off_permanent + (24*32) + 10] = 6;
+    med_buffer[y_off_permanent + (24*32) + 11] = 4;
+    med_buffer[y_off_permanent + (24*32) + 12] = 2;
+    med_buffer[y_off_permanent + (24*32) + 13] = 1;
+    med_buffer[y_off_permanent + (24*32) + 14] = 1;
+
+    med_buffer[y_off_permanent + (25*32) + 9] = 6;
+    med_buffer[y_off_permanent + (25*32) + 10] = 5;
+    med_buffer[y_off_permanent + (25*32) + 11] = 4;
+    med_buffer[y_off_permanent + (25*32) + 12] = 1;
+    med_buffer[y_off_permanent + (25*32) + 13] = 1;
+    med_buffer[y_off_permanent + (25*32) + 14] = 1;
+    med_buffer[y_off_permanent + (25*32) + 15] = 1;
 }
 
 
